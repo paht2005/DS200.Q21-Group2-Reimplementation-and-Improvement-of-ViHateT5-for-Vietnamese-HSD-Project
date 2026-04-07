@@ -7,14 +7,14 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
     requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
 
 setup(
-    name="vietnamese-hate-speech-detection",
+    name="vihatet5-reimplementation",
     version="0.1.0",
-    author="Your Name",
-    author_email="your.email@example.com",
-    description="Vietnamese Hate Speech Detection using PhoBERT",
+    author="Group 02 - DS200.Q21",
+    author_email="23521143@gm.uit.edu.vn",
+    description="Reimplementation and Improvement of ViHateT5 for Vietnamese Hate Speech Detection",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/vietnamese-hate-speech-detection",
+    url="https://github.com/paht2005/DS200.Q21-Group2-Reimplementation-and-Improvement-of-ViHateT5-for-Vietnamese-HSD-Project",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",

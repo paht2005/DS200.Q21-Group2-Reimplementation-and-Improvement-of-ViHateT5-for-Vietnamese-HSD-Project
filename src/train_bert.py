@@ -28,7 +28,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Train hate speech detection model")
     
     parser.add_argument("--dataset", type=str, required=True,
-                       help="Dataset to train on (ViHSD, ViCTSD, ViHOS, ViHSD_processed, Minhbao5xx2/VOZ-HSD_2M)")
+                       help="Dataset to train on (ViHSD, ViCTSD, ViHOS, ViHSD_processed, NCPhat2005/VOZ-HSD_2M)")
     parser.add_argument("--model_name", type=str, default="vinai/phobert-base",
                        help="Pretrained model name")
     parser.add_argument("--max_length", type=int, default=256,

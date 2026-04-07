@@ -232,20 +232,20 @@ def load_voz_hsd_2m(split_name: str = "balanced", dev_ratio: float = 0.1, max_sa
     
     # Load the correct CSV file based on split_name
     if split_name == "hate_only":
-        file_url = "https://huggingface.co/datasets/Minhbao5xx2/re_VOZ-HSD/resolve/main/data_full_date.csv"
+        file_url = "https://huggingface.co/datasets/NCPhat2005/re_VOZ-HSD/resolve/main/data_full_date.csv"
         print(f"  Loading data_full_date.csv (hate_only) from HuggingFace...")
         full_df = pd.read_csv(file_url).dropna()
     elif split_name == "balanced":
-        file_url = "https://huggingface.co/datasets/Minhbao5xx2/re_VOZ-HSD/resolve/main/data_balance.csv"
+        file_url = "https://huggingface.co/datasets/NCPhat2005/re_VOZ-HSD/resolve/main/data_balance.csv"
         print(f"  Loading data_balance.csv (balanced) from HuggingFace...")
         full_df = pd.read_csv(file_url).dropna()
     elif split_name == "full":
-        file_url = "https://huggingface.co/datasets/Minhbao5xx2/re_VOZ-HSD/resolve/main/data.csv"
+        file_url = "https://huggingface.co/datasets/NCPhat2005/re_VOZ-HSD/resolve/main/data.csv"
         print(f"  Loading data.csv (full dataset) from HuggingFace...")
         full_df = pd.read_csv(file_url).dropna()
     else:
         # Default: load balanced dataset
-        file_url = "https://huggingface.co/datasets/Minhbao5xx2/re_VOZ-HSD/resolve/main/data_balance.csv"
+        file_url = "https://huggingface.co/datasets/NCPhat2005/re_VOZ-HSD/resolve/main/data_balance.csv"
         print(f"  Loading default (balanced) dataset from HuggingFace...")
         full_df = pd.read_csv(file_url).dropna()
     
@@ -480,7 +480,7 @@ def load_dataset_by_name(dataset_name: str, split_name: str = None, dev_ratio: f
     Load dataset by name. Falls back to HuggingFace Hub if not found in predefined list.
     
     Args:
-        dataset_name: One of "ViHSD", "ViCTSD", "ViHOS", "ViHSD_processed", "Minhbao5xx2/VOZ-HSD_2M",
+        dataset_name: One of "ViHSD", "ViCTSD", "ViHOS", "ViHSD_processed", "NCPhat2005/VOZ-HSD_2M",
                       or any HuggingFace dataset identifier (e.g., "username/dataset_name")
         split_name: For VOZ-HSD_2M: "balanced" or "hate_only" (default: "balanced")
         dev_ratio: Validation split ratio for datasets that need splitting (default: 0.1)
@@ -499,12 +499,12 @@ def load_dataset_by_name(dataset_name: str, split_name: str = None, dev_ratio: f
     }
     
     # Handle VOZ-HSD 2M
-    if "VOZ-HSD_2M" in dataset_name or dataset_name == "Minhbao5xx2/VOZ-HSD_2M":
+    if "VOZ-HSD_2M" in dataset_name or dataset_name == "NCPhat2005/VOZ-HSD_2M":
         split_to_use = split_name if split_name else "balanced"
         return load_voz_hsd_2m(split_to_use, dev_ratio)
     
-    # Handle Minhbao5xx2/re_VOZ-HSD (different from VOZ-HSD_2M)
-    if dataset_name == "Minhbao5xx2/re_VOZ-HSD":
+    # Handle NCPhat2005/re_VOZ-HSD (different from VOZ-HSD_2M)
+    if dataset_name == "NCPhat2005/re_VOZ-HSD":
         # Use load_voz_hsd_2m with split_name parameter
         split_to_use = split_name if split_name else "balanced"
         return load_voz_hsd_2m(split_to_use, dev_ratio, max_samples=max_samples)
@@ -521,7 +521,7 @@ def load_dataset_by_name(dataset_name: str, split_name: str = None, dev_ratio: f
     # If all else fails, raise error
     raise ValueError(
         f"Unknown dataset: {dataset_name}. "
-        f"Available predefined datasets: {list(loaders.keys()) + ['Minhbao5xx2/VOZ-HSD_2M']}. "
+        f"Available predefined datasets: {list(loaders.keys()) + ['NCPhat2005/VOZ-HSD_2M']}. "
         f"Or use HuggingFace dataset identifier (e.g., 'username/dataset_name')"
     )
 
