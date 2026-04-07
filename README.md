@@ -27,11 +27,6 @@
 
 ---
 
-<p align="center">
-  <img src="results/thumbnail.png" alt="Project thumbnail" width="400">
-</p>
-
-
 
 ---
 
