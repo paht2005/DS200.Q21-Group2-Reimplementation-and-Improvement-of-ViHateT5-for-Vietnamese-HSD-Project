@@ -610,5 +610,4 @@ If you use the code, datasets, or models from this project, please cite the foll
 
 This project is for academic use in the course **DS200.Q21 - Big Data Analysis** at the University of Information Technology (UIT – VNU-HCM).
 
-This project is licensed under the MIT License.
-
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
