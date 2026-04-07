@@ -9,12 +9,12 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 setup(
     name="vihatet5-reimplementation",
     version="0.1.0",
-    author="Group 02 - DS200.Q21",
-    author_email="23521143@gm.uit.edu.vn",
-    description="Reimplementation and Improvement of ViHateT5 for Vietnamese Hate Speech Detection",
+    author="Your Name",
+    author_email="your.email@example.com",
+    description="Vietnamese Hate Speech Detection using PhoBERT",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/paht2005/DS200.Q21-Group2-Reimplementation-and-Improvement-of-ViHateT5-for-Vietnamese-HSD-Project",
+    url="https://github.com/yourusername/vietnamese-hate-speech-detection",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
