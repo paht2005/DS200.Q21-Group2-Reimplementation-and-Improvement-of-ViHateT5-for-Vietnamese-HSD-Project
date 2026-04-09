@@ -38,7 +38,7 @@
 | No. | Student ID | Full Name | Class Order | Role | Github | Email |
 |----:|:----------:|-----------|:---:|------|--------|-------|
 | 1 | 23521143 | Phat Cong Nguyen | 45 | Leader | [paht2005](https://github.com/paht2005) | 23521143@gm.uit.edu.vn |
-| 2 | 23520032 | An Thanh Hoang Truong | 3 | Member | [awnpvng](https://github.com/awnpvng) (primary account) / [[Awnpz](https://github.com/Awnpz) (secondary account)  | 23520032@gm.uit.edu.vn |
+| 2 | 23520032 | An Thanh Hoang Truong | 3 | Member | [awnpvng](https://github.com/awnpvng) (primary account) / [Awnpz](https://github.com/Awnpz) (secondary account)  | 23520032@gm.uit.edu.vn |
 | 3 | 23520213 | Cuong Viet Vu | 9 | Member | [Kun05-AI](https://github.com/Kun05-AI) | 23520213@gm.uit.edu.vn |
 
 ---
