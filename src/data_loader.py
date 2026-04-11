@@ -232,20 +232,20 @@ def load_voz_hsd_2m(split_name: str = "balanced", dev_ratio: float = 0.1, max_sa
     
     # Load the correct CSV file based on split_name
     if split_name == "hate_only":
-        file_url = "https://huggingface.co/datasets/NCPhat2005/re_VOZ-HSD/resolve/main/data_full_date.csv"
+        file_url = "https://huggingface.co/datasets/NCPhat2005/voz_hsd_labeled/resolve/main/data_full_date.csv"
         print(f"  Loading data_full_date.csv (hate_only) from HuggingFace...")
         full_df = pd.read_csv(file_url).dropna()
     elif split_name == "balanced":
-        file_url = "https://huggingface.co/datasets/NCPhat2005/re_VOZ-HSD/resolve/main/data_balance.csv"
+        file_url = "https://huggingface.co/datasets/NCPhat2005/voz_hsd_labeled/resolve/main/data_balance.csv"
         print(f"  Loading data_balance.csv (balanced) from HuggingFace...")
         full_df = pd.read_csv(file_url).dropna()
     elif split_name == "full":
-        file_url = "https://huggingface.co/datasets/NCPhat2005/re_VOZ-HSD/resolve/main/data.csv"
+        file_url = "https://huggingface.co/datasets/NCPhat2005/voz_hsd_labeled/resolve/main/data.csv"
         print(f"  Loading data.csv (full dataset) from HuggingFace...")
         full_df = pd.read_csv(file_url).dropna()
     else:
         # Default: load balanced dataset
-        file_url = "https://huggingface.co/datasets/NCPhat2005/re_VOZ-HSD/resolve/main/data_balance.csv"
+        file_url = "https://huggingface.co/datasets/NCPhat2005/voz_hsd_labeled/resolve/main/data_balance.csv"
         print(f"  Loading default (balanced) dataset from HuggingFace...")
         full_df = pd.read_csv(file_url).dropna()
     
@@ -503,8 +503,8 @@ def load_dataset_by_name(dataset_name: str, split_name: str = None, dev_ratio: f
         split_to_use = split_name if split_name else "balanced"
         return load_voz_hsd_2m(split_to_use, dev_ratio)
     
-    # Handle NCPhat2005/re_VOZ-HSD (different from VOZ-HSD_2M)
-    if dataset_name == "NCPhat2005/re_VOZ-HSD":
+    # Handle NCPhat2005/voz_hsd_labeled (different from VOZ-HSD_2M)
+    if dataset_name == "NCPhat2005/voz_hsd_labeled" or dataset_name == "NCPhat2005/re_VOZ-HSD":
         # Use load_voz_hsd_2m with split_name parameter
         split_to_use = split_name if split_name else "balanced"
         return load_voz_hsd_2m(split_to_use, dev_ratio, max_samples=max_samples)

@@ -21,7 +21,7 @@ TEXT_COL = "text"
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Pretrain ViHate T5 with span corruption")
-    parser.add_argument("--dataset_name", type=str, default=None, help="Dataset name to load via load_dataset_by_name (e.g., 'NCPhat2005/re_VOZ-HSD')")
+    parser.add_argument("--dataset_name", type=str, default=None, help="Dataset name to load via load_dataset_by_name (e.g., 'NCPhat2005/voz_hsd_labeled')")
     parser.add_argument("--split_name", type=str, default=None, help="Split name for VOZ-HSD datasets: 'balanced', 'hate_only', or 'full' (default: 'balanced')")
     parser.add_argument("--max_samples", type=int, default=None, help="Maximum number of samples to use (for limiting dataset size)")
     parser.add_argument("--train_file", type=str, default="data/train.txt", help="Path to training text file (one example per line)")

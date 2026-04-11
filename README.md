@@ -103,14 +103,14 @@ All datasets are loaded automatically from HuggingFace or local files via `data_
 
 Key resources developed in this project:
 
-* **Reimplemented ViHateT5**: [re_VihateT5](https://huggingface.co/NCPhat2005/re_VihateT5) — Full reimplementation of the ViHateT5 model (T5ForConditionalGeneration, vit5-base architecture, 12 layers, d_model=768). Fine-tuned on all three downstream hate speech detection tasks.
-* **Labeling Model**: [labeling_visobert](https://huggingface.co/NCPhat2005/labeling_visobert) — ViSoBERT-based model used for auto-labeling large-scale datasets.
-* **Labeled Dataset**: [re_VOZ-HSD](https://huggingface.co/datasets/NCPhat2005/re_VOZ-HSD) — VOZ dataset with 12M+ rows, fully processed and labeled.
-* **Fine-tuned Model (3-datasets, Hate-Only)**: [Hate_only_ViT5](https://huggingface.co/NCPhat2005/Hate_only_ViT5) — ViT5-base fine-tuned jointly on ViHSD, ViCTSD, ViHOS from the "hate-only" pre-trained checkpoint.
-* **Fine-tuned Model (3-datasets, Balanced)**: [balance_Vi_T5](https://huggingface.co/NCPhat2005/balance_Vi_T5) — ViT5-base fine-tuned jointly on 3 datasets from the "balanced" pre-trained checkpoint.
-* **Fine-tuned Model (Multi-dataset version)**: [vit5_multi_dataset](https://huggingface.co/NCPhat2005/vit5_multi_dataset) — Another ViT5-base variant trained via `src/train_t5.py`.
-* **Pre-trained Model (Hate-Only)**: [pre_train_ViT5_hate_only](https://huggingface.co/NCPhat2005/pre_train_ViT5_hate_only) — ViT5 pre-trained with Span Corruption on **100,000 samples** from VOZ "hate-only" split.
-* **Pre-trained Model (Balanced)**: [balance_pre_train_Vi_T5](https://huggingface.co/NCPhat2005/balance_pre_train_Vi_T5) — ViT5 pre-trained with Span Corruption on **200,000 samples** from VOZ "balanced" split.
+* **Reimplemented ViHateT5**: [vihatet5_reimpl](https://huggingface.co/NCPhat2005/vihatet5_reimpl) — Full reimplementation of the ViHateT5 model (T5ForConditionalGeneration, vit5-base architecture, 12 layers, d_model=768). Fine-tuned on all three downstream hate speech detection tasks.
+* **Labeling Model**: [visobert_labeling](https://huggingface.co/NCPhat2005/visobert_labeling) — ViSoBERT-based model used for auto-labeling large-scale datasets.
+* **Labeled Dataset**: [voz_hsd_labeled](https://huggingface.co/datasets/NCPhat2005/voz_hsd_labeled) — VOZ dataset with 12M+ rows, fully processed and labeled.
+* **Fine-tuned Model (3-datasets, Hate-Only)**: [vit5_finetune_hate_only](https://huggingface.co/NCPhat2005/vit5_finetune_hate_only) — ViT5-base fine-tuned jointly on ViHSD, ViCTSD, ViHOS from the "hate-only" pre-trained checkpoint.
+* **Fine-tuned Model (3-datasets, Balanced)**: [vit5_finetune_balanced](https://huggingface.co/NCPhat2005/vit5_finetune_balanced) — ViT5-base fine-tuned jointly on 3 datasets from the "balanced" pre-trained checkpoint.
+* **Fine-tuned Model (Multi-dataset version)**: [vit5_finetune_multi](https://huggingface.co/NCPhat2005/vit5_finetune_multi) — Another ViT5-base variant trained via `src/train_t5.py`.
+* **Pre-trained Model (Hate-Only)**: [vit5_pretrain_hate_only](https://huggingface.co/NCPhat2005/vit5_pretrain_hate_only) — ViT5 pre-trained with Span Corruption on **100,000 samples** from VOZ "hate-only" split.
+* **Pre-trained Model (Balanced)**: [vit5_pretrain_balanced](https://huggingface.co/NCPhat2005/vit5_pretrain_balanced) — ViT5 pre-trained with Span Corruption on **200,000 samples** from VOZ "balanced" split.
 
 ---
 
@@ -137,7 +137,9 @@ DS200.Q21_Project/
 ├── scripts/                          # Shell scripts for training pipelines
 │   ├── run_pretrain_t5.sh            # T5 pre-training with Span Corruption
 │   ├── run_train_t5.sh               # T5 fine-tuning (Seq2Seq classification)
-│   └── run_train_bert.sh             # BERT-based model training
+│   ├── run_train_bert.sh             # BERT-based model training
+│   ├── push_models_to_hf.py          # Upload model folders to HuggingFace (Python)
+│   └── push_models_to_hf.sh          # Upload model folders to HuggingFace (Bash)
 │
 ├── src/                              # Core source code
 │   ├── __init__.py                   # Package initialization
@@ -171,14 +173,14 @@ DS200.Q21_Project/
 │   └── test_quality_gates.py         # Quality gates (secrets, consistency)
 │
 └── models/                           # Pre-trained & fine-tuned model weights (gitignored)
-    ├── balance_pre_train_Vi_T5/      # Pre-trained ViT5 (200K balanced samples)
-    ├── balance_Vi_T5/                # Fine-tuned ViT5 (balanced checkpoint)
-    ├── Hate_only_ViT5/               # Fine-tuned ViT5 (hate-only checkpoint)
-    ├── pre_train_ViT5_hate_only/     # Pre-trained ViT5 (100K hate-only samples)
-    ├── vit5_multi_dataset/           # Fine-tuned ViT5 (multi-dataset version)
-    ├── Labeling_visobert/            # ViSoBERT model for auto-labeling
-    ├── re_VihateT5/                  # Reimplemented ViHateT5
-    └── re_VOZ-HSD/                   # Labeled VOZ-HSD dataset files
+    ├── vit5_pretrain_balanced/       # Pre-trained ViT5 (200K balanced samples)
+    ├── vit5_pretrain_hate_only/      # Pre-trained ViT5 (100K hate-only samples)
+    ├── vit5_finetune_balanced/       # Fine-tuned ViT5 (balanced checkpoint)
+    ├── vit5_finetune_hate_only/      # Fine-tuned ViT5 (hate-only checkpoint)
+    ├── vit5_finetune_multi/          # Fine-tuned ViT5 (multi-dataset version)
+    ├── vihatet5_reimpl/              # Reimplemented ViHateT5
+    ├── visobert_labeling/            # ViSoBERT model for auto-labeling
+    └── voz_hsd_labeled/              # Labeled VOZ-HSD dataset files
     # All model weights are excluded from git; download from HuggingFace collection above
 ```
 
@@ -294,13 +296,45 @@ bash scripts/run_train_bert.sh \
 
 ```bash
 python src/evaluate.py \
-    --model_id "NCPhat2005/balance_Vi_T5" \
+    --model_id "NCPhat2005/vit5_finetune_balanced" \
     --batch_size 32
 ```
 
 ### 5. Interactive Demo
 
 Open [`notebooks/demo.ipynb`](notebooks/demo.ipynb) in Jupyter to run inference on all three tasks interactively.
+
+### 6. Push Models to Hugging Face
+
+Two scripts are provided to upload each subfolder in `models/` to its own Hugging Face repository:
+
+**Option A — Python script** (recommended, uses HF API directly):
+```bash
+# Dry-run first (no network changes)
+python scripts/push_models_to_hf.py \
+    --username "NCPhat2005" \
+    --dry-run
+
+# Create missing repos and push all folders
+python scripts/push_models_to_hf.py \
+    --username "NCPhat2005" \
+    --create-repos
+
+# Push only selected folders (comma-separated)
+python scripts/push_models_to_hf.py \
+    --username "NCPhat2005" \
+    --include "vihatet5_reimpl,voz_hsd_labeled"
+```
+
+**Option B — Bash script** (uses git + git-lfs):
+```bash
+bash scripts/push_models_to_hf.sh \
+    --username "NCPhat2005" \
+    --create-repos
+```
+
+> **Requirements**: `pip install huggingface_hub`, `git-lfs`, and a Hugging Face write token.
+> Login first: `python -c "from huggingface_hub import login; login()"`
 
 ### Training Configurations
 
@@ -398,7 +432,7 @@ optim = "adamw_torch"
 
 ```python
 # Model & Tokenizer
-model_name = "NCPhat2005/labeling_visobert"
+model_name = "NCPhat2005/visobert_labeling"
 max_length = 256
 batch_size = 128
 ```
@@ -435,7 +469,7 @@ After running training, results are saved to `outputs/` or `vihate_t5_pretrain/`
 
 ### Auto-Labeling Performance (ViSoBERT)
 
-The **labeling_visobert** model was used to automatically label the VOZ-HSD dataset:
+The **visobert_labeling** model was used to automatically label the VOZ-HSD dataset:
 
 | Metric | Result |
 | :--- | :---: |
@@ -602,6 +636,74 @@ If you use the code, datasets, or models from this project, please cite the foll
   url={https://aclanthology.org/2024.findings-acl.355.pdf}
 }
 ```
+
+---
+
+## **HuggingFace Deployment Guide**
+
+All trained models and datasets are hosted on the [HuggingFace Collection](https://huggingface.co/collections/NCPhat2005/ds200q21-big-data-analysis-group-2).
+
+### Downloading a Model
+
+```python
+from transformers import AutoTokenizer, T5ForConditionalGeneration
+
+model = T5ForConditionalGeneration.from_pretrained("NCPhat2005/vit5_finetune_balanced")
+tokenizer = AutoTokenizer.from_pretrained("NCPhat2005/vit5_finetune_balanced")
+```
+
+### Uploading Models to HuggingFace
+
+1. **Install dependencies**:
+   ```bash
+   pip install huggingface_hub
+   brew install git-lfs   # macOS
+   git lfs install
+   ```
+
+2. **Authenticate** (requires a [write token](https://huggingface.co/settings/tokens)):
+   ```python
+   from huggingface_hub import login
+   login()
+   ```
+
+3. **Push all model folders** (one folder = one HF repo):
+   ```bash
+   # Dry-run to preview actions
+   python scripts/push_models_to_hf.py --username NCPhat2005 --dry-run
+
+   # Create repos and upload
+   python scripts/push_models_to_hf.py --username NCPhat2005 --create-repos
+   ```
+
+4. **Push selected folders only**:
+   ```bash
+   python scripts/push_models_to_hf.py \
+       --username NCPhat2005 \
+       --include "vihatet5_reimpl,voz_hsd_labeled"
+   ```
+
+The script automatically infers repo type: folders containing `model.safetensors` or `config.json` are uploaded as **model** repos; others as **dataset** repos.
+
+### Renaming a HuggingFace Repo
+
+```python
+from huggingface_hub import HfApi
+api = HfApi()
+api.move_repo(from_id="NCPhat2005/old_name", to_id="NCPhat2005/new_name", repo_type="model")
+```
+
+Or navigate to **Repo Settings → Rename** on the HuggingFace web interface.
+
+---
+
+## **Acknowledgements**
+
+- **FPT Corporation** for providing the NVIDIA H200 GPU voucher used for all experiments.
+- **VietAI** for the [ViT5](https://github.com/vietai/ViT5) pre-trained model.
+- **UIT-NLP** for the [ViSoBERT](https://huggingface.co/uitnlp/visobert) model and Vietnamese NLP datasets (ViHSD, ViCTSD, ViHOS).
+- **Hugging Face** for hosting all models and datasets.
+- **Luan Thanh Nguyen** for the original [ViHateT5 paper](https://aclanthology.org/2024.findings-acl.355.pdf) (ACL 2024 Findings).
 
 ---
 

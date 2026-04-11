@@ -3,7 +3,7 @@
 # Usage: bash scripts/run_pretrain_t5.sh
 
 # Default values
-DATASET_NAME="NCPhat2005/re_VOZ-HSD"
+DATASET_NAME="NCPhat2005/voz_hsd_labeled"
 SPLIT_NAME="hate_only"
 MAX_SAMPLES=50000
 OUTPUT_DIR="vihate_t5_pretrain"
