@@ -1,0 +1,6 @@
+text,vihsd,victsd,vihos_output,vihos_spans
+Cảm ơn bạn đã chia sẻ thông tin hữu ích này!,CLEAN,NONE,Cảm ơn bạn đã chia sẻ thông tin hữu ích này!,None
+Bạn nói chuyện như thế này thật không hay chút nào.,OFFENSIVE,NONE,Bạn nói chuyện như thế này thật không hay chút nào.,None
+Đồ ngu như mày thì đừng có nói nữa!,HATE,TOXIC,[HATE]Đồ ngu[HATE] như [HATE]mày[HATE] thì đừng có nói nữa!,"[(0, 6), (11, 14)]"
+"Mày là đồ rác rưởi, đừng có xuất hiện ở đây nữa!",HATE,TOXIC,"[HATE]Mày[HATE] là [HATE]đồ rác rưởi[HATE], đừng có xuất hiện ở đây nữa!","[(0, 3), (7, 19)]"
+Bài viết này rất hay và có ý nghĩa.,CLEAN,NONE,Bài viết này rất hay và có ý nghĩa.,None

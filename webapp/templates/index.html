@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ViHateT5 Demo — Vietnamese Hate Speech Detection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['class', '[data-theme="dark"]'],
+      theme: {
+        extend: {
+          colors: {
+            uit: { DEFAULT: '#00468C', dark: '#003264', light: '#DCE8FA', accent: '#1a73e8' },
+            hate: '#dc3545',
+            offensive: '#ffc107',
+            clean: '#28a745',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex transition-colors duration-300">
+
+  <!-- ========== SIDEBAR ========== -->
+  <aside id="sidebar" class="sidebar w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0 flex flex-col overflow-y-auto">
+    <!-- Logo -->
+    <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+      <img src="https://i.imgur.com/WmMnSRt.png" alt="UIT" class="w-44 mx-auto mb-3" />
+      <h1 class="text-xl font-bold text-uit text-center">ViHateT5 Demo</h1>
+      <p class="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">DS200.Q21 — Big Data Analysis — Group 02</p>
+    </div>
+
+    <!-- Model selector -->
+    <div class="p-5 space-y-4 flex-1">
+      <div>
+        <label for="model-select" class="block text-sm font-semibold mb-1">🤖 Select Model</label>
+        <select id="model-select" class="select-control w-full">
+          {% for label, mid in models.items() %}
+          <option value="{{ label }}" {% if loop.first %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <p id="model-id-display" class="text-xs text-gray-400 mt-1 font-mono"></p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-1">📋 Select Task</label>
+        <div class="space-y-2">
+          {% for key, label in tasks.items() %}
+          <label class="flex items-center gap-2 cursor-pointer task-radio-label rounded-lg px-3 py-2 border border-gray-200 dark:border-gray-600 hover:border-uit transition-colors">
+            <input type="radio" name="task" value="{{ key }}" {% if loop.first %}checked{% endif %} class="accent-uit" />
+            <span class="text-sm">{{ label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <hr class="border-gray-200 dark:border-gray-700" />
+
+      <div class="space-y-2 text-xs text-gray-500 dark:text-gray-400">
+        <p><strong>Paper:</strong> <a href="https://aclanthology.org/2024.findings-acl.355.pdf" target="_blank" class="text-uit hover:underline">ViHateT5 (ACL 2024)</a></p>
+        <p><strong>Device:</strong> <span id="device-badge" class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">{{ device }}</span></p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-4 border-t border-gray-200 dark:border-gray-700 space-y-1 text-xs text-gray-400">
+      <div class="flex gap-3 justify-center">
+        <a href="https://github.com/paht2005/DS200.Q21-Group2-Reimplementation-and-Improvement-of-ViHateT5-for-Vietnamese-HSD-Project" target="_blank" class="hover:text-uit transition-colors" title="GitHub">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="https://huggingface.co/collections/NCPhat2005/ds200q21-big-data-analysis-group-2" target="_blank" class="hover:text-uit transition-colors" title="HuggingFace">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1.5 6.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm6 0a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM12 18c-2.761 0-5-1.79-5-4h10c0 2.21-2.239 4-5 4z"/></svg>
+        </a>
+      </div>
+      <p class="text-center mt-2">© 2024 Group 02 — UIT VNU-HCM</p>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="flex-1 flex flex-col min-h-screen overflow-y-auto">
+
+    <!-- Top bar -->
+    <header class="sticky top-0 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur border-b border-gray-200 dark:border-gray-700 px-6 py-3 flex items-center justify-between">
+      <button id="sidebar-toggle" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <h2 class="text-lg font-bold hidden sm:block">🛡️ Vietnamese Hate Speech Detection</h2>
+      <div class="flex items-center gap-3">
+        <!-- Tab navigation -->
+        <nav class="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+          <button class="tab-btn active" data-tab="inference">🔍 Inference</button>
+          <button class="tab-btn" data-tab="batch">📂 Batch</button>
+          <button class="tab-btn" data-tab="about">ℹ️ About</button>
+        </nav>
+        <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Toggle theme">
+          <svg id="theme-icon-light" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          <svg id="theme-icon-dark" class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Tab content -->
+    <div class="flex-1 p-6">
+
+      <!-- ===== INFERENCE TAB ===== -->
+      <section id="tab-inference" class="tab-content active">
+        <div class="grid lg:grid-cols-2 gap-6">
+          <!-- Input panel -->
+          <div class="card">
+            <h3 class="font-bold text-lg mb-4">Input Text</h3>
+            <textarea id="input-text" rows="5" class="input-control w-full mb-3" placeholder="Nhập văn bản tiếng Việt tại đây…"></textarea>
+
+            <!-- Quick samples -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              <button class="sample-btn bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700" data-text="Cảm ơn bạn đã chia sẻ thông tin hữu ích này!">🟢 Clean</button>
+              <button class="sample-btn bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-700" data-text="Bạn nói chuyện như thế này thật không hay chút nào.">🟡 Offensive</button>
+              <button class="sample-btn bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700" data-text="Đồ ngu như mày thì đừng có nói nữa!">🔴 Hate</button>
+            </div>
+
+            <button id="run-btn" class="btn-primary w-full">
+              <span id="run-btn-text">▶ Run Inference</span>
+              <span id="run-btn-spinner" class="hidden">
+                <svg class="animate-spin h-5 w-5 inline mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                Processing…
+              </span>
+            </button>
+          </div>
+
+          <!-- Result panel -->
+          <div class="card">
+            <h3 class="font-bold text-lg mb-4">Results</h3>
+            <div id="result-placeholder" class="flex items-center justify-center h-48 text-gray-400 dark:text-gray-500">
+              <p class="text-center">Enter text and click <strong>Run Inference</strong> to see results.</p>
+            </div>
+            <div id="result-content" class="hidden space-y-4">
+              <!-- Primary result -->
+              <div id="result-primary" class="text-center p-6 rounded-xl transition-all duration-300"></div>
+              <!-- Inference time -->
+              <p id="result-time" class="text-xs text-gray-400 text-center"></p>
+              <!-- All-task results -->
+              <div id="result-all-tasks" class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h4 class="text-sm font-semibold mb-2">All-task results:</h4>
+                <div id="all-tasks-list" class="space-y-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== BATCH TAB ===== -->
+      <section id="tab-batch" class="tab-content hidden">
+        <div class="card max-w-2xl mx-auto">
+          <h3 class="font-bold text-lg mb-4">Batch Inference</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Upload a CSV file with a text column to run batch predictions.</p>
+
+          <form id="batch-form" class="space-y-4">
+            <!-- Drop zone -->
+            <div id="drop-zone" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-uit transition-colors cursor-pointer">
+              <svg class="w-10 h-10 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Drag & drop CSV here, or <span class="text-uit font-medium">click to browse</span></p>
+              <input type="file" id="batch-file" accept=".csv" class="hidden" />
+              <p id="file-name" class="text-xs text-uit font-medium mt-2 hidden"></p>
+            </div>
+
+            <div>
+              <label for="batch-text-col" class="block text-sm font-medium mb-1">Text column name</label>
+              <input type="text" id="batch-text-col" value="text" class="input-control w-full" />
+            </div>
+
+            <button type="submit" id="batch-run-btn" class="btn-primary w-full" disabled>
+              <span id="batch-btn-text">▶ Run Batch Inference</span>
+              <span id="batch-btn-spinner" class="hidden">
+                <svg class="animate-spin h-5 w-5 inline mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                Processing…
+              </span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ===== ABOUT TAB ===== -->
+      <section id="tab-about" class="tab-content hidden">
+        <div class="card max-w-3xl mx-auto prose dark:prose-invert">
+          <h3 class="text-xl font-bold">About This Project</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">DS200.Q21 — Big Data Analysis — Course Project (Group 02)<br/>University of Information Technology (UIT — VNU-HCM)</p>
+
+          <h4>Paper</h4>
+          <p><strong>ViHateT5: Enhancing Hate Speech Detection in Vietnamese With a Unified Text-to-Text Transformer Model</strong><br/>
+          Luan Thanh Nguyen — Findings of ACL 2024, pp. 5948–5961<br/>
+          <a href="https://aclanthology.org/2024.findings-acl.355.pdf" target="_blank" class="text-uit hover:underline">Read Paper →</a></p>
+
+          <h4>Team</h4>
+          <table class="text-sm">
+            <thead><tr><th>No.</th><th>Student ID</th><th>Full Name</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>23521143</td><td>Phat Cong Nguyen</td><td>Leader</td></tr>
+              <tr><td>2</td><td>23520032</td><td>An Thanh Hoang Truong</td><td>Member</td></tr>
+              <tr><td>3</td><td>23520213</td><td>Cuong Viet Vu</td><td>Member</td></tr>
+            </tbody>
+          </table>
+
+          <h4>Methodology</h4>
+          <ol class="text-sm">
+            <li><strong>Auto-Labeling Pipeline:</strong> ViSoBERT labels 10M+ VOZ forum comments (97.5% accuracy)</li>
+            <li><strong>Continual Pre-training:</strong> T5 Span Corruption on domain-specific data (200K balanced samples)</li>
+            <li><strong>Multi-task Fine-tuning:</strong> Unified T5 model for ViHSD, ViCTSD, and ViHOS tasks</li>
+          </ol>
+
+          <h4>Tasks Supported</h4>
+          <ul class="text-sm">
+            <li><strong>ViHSD:</strong> 3-class hate speech detection (CLEAN / OFFENSIVE / HATE)</li>
+            <li><strong>ViCTSD:</strong> Binary toxic speech detection (NONE / TOXIC)</li>
+            <li><strong>ViHOS:</strong> Character-level hate span detection with [HATE] markers</li>
+          </ul>
+
+          <h4>Links</h4>
+          <ul class="text-sm">
+            <li><a href="https://github.com/paht2005/DS200.Q21-Group2-Reimplementation-and-Improvement-of-ViHateT5-for-Vietnamese-HSD-Project" target="_blank" class="text-uit hover:underline">GitHub Repository</a></li>
+            <li><a href="https://huggingface.co/collections/NCPhat2005/ds200q21-big-data-analysis-group-2" target="_blank" class="text-uit hover:underline">HuggingFace Collection</a></li>
+            <li><a href="/docs" target="_blank" class="text-uit hover:underline">API Documentation (FastAPI)</a></li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Sidebar overlay -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/40 z-30 hidden lg:hidden"></div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

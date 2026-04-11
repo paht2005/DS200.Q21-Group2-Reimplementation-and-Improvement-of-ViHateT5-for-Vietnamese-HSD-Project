@@ -1,0 +1,35 @@
+================================================================================
+ViHateT5 — Sample Inference Results
+Model: NCPhat2005/vit5_finetune_balanced
+================================================================================
+
+Input: Cảm ơn bạn đã chia sẻ thông tin hữu ích này!
+  ViHSD  → CLEAN
+  ViCTSD → NONE
+  ViHOS  → Cảm ơn bạn đã chia sẻ thông tin hữu ích này!
+  Spans  → None
+------------------------------------------------------------
+Input: Bạn nói chuyện như thế này thật không hay chút nào.
+  ViHSD  → OFFENSIVE
+  ViCTSD → NONE
+  ViHOS  → Bạn nói chuyện như thế này thật không hay chút nào.
+  Spans  → None
+------------------------------------------------------------
+Input: Đồ ngu như mày thì đừng có nói nữa!
+  ViHSD  → HATE
+  ViCTSD → TOXIC
+  ViHOS  → [HATE]Đồ ngu[HATE] như [HATE]mày[HATE] thì đừng có nói nữa!
+  Spans  → [(0, 6), (11, 14)]
+------------------------------------------------------------
+Input: Mày là đồ rác rưởi, đừng có xuất hiện ở đây nữa!
+  ViHSD  → HATE
+  ViCTSD → TOXIC
+  ViHOS  → [HATE]Mày[HATE] là [HATE]đồ rác rưởi[HATE], đừng có xuất hiện ở đây nữa!
+  Spans  → [(0, 3), (7, 19)]
+------------------------------------------------------------
+Input: Bài viết này rất hay và có ý nghĩa.
+  ViHSD  → CLEAN
+  ViCTSD → NONE
+  ViHOS  → Bài viết này rất hay và có ý nghĩa.
+  Spans  → None
+------------------------------------------------------------

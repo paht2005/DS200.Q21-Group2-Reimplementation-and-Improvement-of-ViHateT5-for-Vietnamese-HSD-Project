@@ -75,3 +75,7 @@ temp/
 Thumbs.db
 .DS_Store
 
+# Reference PDFs (not part of project)
+refer.pdf
+
+

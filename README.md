@@ -79,7 +79,7 @@ This project addresses all four final project requirements for DS200.Q21:
 - **Auto-Labeling Pipeline:** ViSoBERT-based labeling of 10M+ VOZ-HSD samples with 97.5% agreement with manual annotations.
 - **Multi-Model Benchmarking:** Comparison of 8 BERT-based encoders and 3 T5-based generative models.
 - **Reproducible Training:** Shell scripts with configurable CLI arguments for all training stages.
-- **Interactive Demo:** Jupyter notebook for real-time inference on all three tasks.
+- **Interactive Demo:** Streamlit web app and Jupyter notebook for real-time inference on all three tasks.
 
 ---
 
@@ -153,7 +153,19 @@ DS200.Q21_Project/
 │   ├── t5_data_collator.py           # T5 MLM data collator
 │   ├── evaluate.py                   # T5 model evaluation script
 │   ├── inference.py                  # Encoder model inference
-│   └── label_dataset.py              # Auto-labeling pipeline for VOZ-HSD
+│   ├── label_dataset.py              # Auto-labeling pipeline for VOZ-HSD
+│   └── visualize.py                  # Benchmark visualization chart generation
+│
+├── app.py                            # Streamlit demo application
+│
+├── webapp/                           # FastAPI web demo (faster, modern UI)
+│   ├── __init__.py
+│   ├── main.py                       # FastAPI routes & model loading
+│   ├── templates/
+│   │   └── index.html                # Jinja2 HTML template (Tailwind CSS)
+│   └── static/
+│       ├── css/style.css             # Custom stylesheet
+│       └── js/app.js                 # Client-side JavaScript
 │
 ├── notebooks/                        # Jupyter notebooks
 │   └── demo.ipynb                    # Interactive demo for inference on 3 tasks
@@ -302,9 +314,40 @@ python src/evaluate.py \
 
 ### 5. Interactive Demo
 
+**Option A — FastAPI Web App (recommended, faster inference):**
+```bash
+uvicorn webapp.main:app --reload --host 0.0.0.0 --port 8000
+```
+Open [http://localhost:8000](http://localhost:8000). Features:
+- **Modern UI** — Tailwind CSS, dark/light theme, responsive
+- **Faster inference** — Dynamic INT8 quantization (~2x faster on CPU)
+- **Single & Batch** — Type text or upload CSV for bulk predictions
+- **All models & tasks** — Switch between 4 T5 variants and 3 tasks
+- **API docs** — Auto-generated at [/docs](http://localhost:8000/docs)
+
+**Option B — Streamlit Web App:**
+```bash
+streamlit run app.py
+```
+This launches a web UI with:
+- **Inference tab** — Type Vietnamese text, get classification or hate span detection
+- **Batch Inference tab** — Upload CSV for bulk predictions
+- **Model Comparison tab** — Interactive benchmark charts (all models × 3 tasks)
+- **Analysis tab** — Strengths/weaknesses evaluation, pre-training data impact
+- **About tab** — Paper reference, team info, methodology
+
+**Option C — Jupyter Notebook:**
+
 Open [`notebooks/demo.ipynb`](notebooks/demo.ipynb) in Jupyter to run inference on all three tasks interactively.
 
-### 6. Push Models to Hugging Face
+### 6. Generate Benchmark Charts
+
+```bash
+python src/visualize.py
+```
+Saves comparison charts to `results/images/` and sample outputs to `results/test/`.
+
+### 7. Push Models to Hugging Face
 
 Two scripts are provided to upload each subfolder in `models/` to its own Hugging Face repository:
 

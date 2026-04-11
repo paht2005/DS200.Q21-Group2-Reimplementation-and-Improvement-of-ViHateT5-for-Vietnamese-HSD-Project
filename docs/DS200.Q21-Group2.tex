@@ -60,6 +60,7 @@
 
 % ---------- Packages ----------
 \usepackage{graphicx}
+\graphicspath{{../results/images/}{images/}}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{amsmath,amssymb}
@@ -553,6 +554,44 @@
 \section{Results}
 % ============================================================
 
+% ----------------------------------------------------------
+\begin{frame}{BERT Models — Macro F1 Comparison (Visual)}
+  \begin{center}
+    \includegraphics[width=0.92\textwidth]{model_comparison_macro_f1.png}
+  \end{center}
+  \vspace{-0.2cm}
+  \begin{center}
+    \small Macro F1 across 9 models and 3 Vietnamese hate speech benchmarks.
+  \end{center}
+\end{frame}
+
+% ----------------------------------------------------------
+\begin{frame}{T5 Models — Macro F1 Comparison (Visual)}
+  \begin{center}
+    \includegraphics[width=0.72\textwidth]{t5_comparison_macro_f1.png}
+  \end{center}
+  \vspace{-0.2cm}
+  \begin{center}
+    \small ViHateT5 (Ours) outperforms both ViT5-base and mT5-base across all tasks.
+  \end{center}
+\end{frame}
+
+% ----------------------------------------------------------
+\begin{frame}{Average Macro F1 Ranking (Visual)}
+  \begin{columns}[T]
+    \column{0.52\textwidth}
+    \includegraphics[width=\textwidth]{average_mf1_ranking.png}
+
+    \column{0.44\textwidth}
+    \includegraphics[width=\textwidth]{radar_top3_models.png}
+    \vspace{0.2cm}
+    \begin{exampleblock}{Insight}
+      \small ViHateT5 and ViSoBERT dominate. The radar chart shows ViHateT5's balanced strength across all three tasks.
+    \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+% ----------------------------------------------------------
 \begin{frame}[shrink=5]{Auto-Labeling Performance}
   \begin{columns}[T]
     \column{0.45\textwidth}
@@ -778,6 +817,17 @@
 \end{frame}
 
 % ----------------------------------------------------------
+\begin{frame}{Pre-training Data Ratio Impact (Visual)}
+  \begin{center}
+    \includegraphics[width=0.88\textwidth]{pretrain_data_ratio_impact.png}
+  \end{center}
+  \vspace{-0.2cm}
+  \begin{center}
+    \small Different data ratios (100\% hate, 50\% hate, 5.54\% hate) and epoch counts\\affect downstream task performance differently.
+  \end{center}
+\end{frame}
+
+% ----------------------------------------------------------
 \begin{frame}[shrink=5]{Extended BERT Comparison (Table 6)}
   \begin{columns}[T]
     \column{0.48\textwidth}
@@ -876,6 +926,89 @@
         \item \textbf{Data augmentation} for underrepresented classes
         \item Larger pre-training corpus and longer schedules
         \item Cross-lingual transfer for other low-resource languages
+      \end{itemize}
+    \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+% ============================================================
+\section{Demo \& Repository}
+% ============================================================
+
+\begin{frame}[shrink=5]{Interactive Web Demo}
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \begin{block}{FastAPI + Jinja2 Demo}
+      \begin{itemize}
+        \item Modern web interface with \textbf{Tailwind CSS}
+        \item Dynamic INT8 quantization for \textbf{2$\times$ faster} CPU inference
+        \item Supports all \textbf{4 model variants} and \textbf{3 tasks}
+        \item Single-text and \textbf{batch CSV} inference
+        \item Dark/light theme, responsive design
+        \item Auto-generated API docs at \texttt{/docs}
+      \end{itemize}
+    \end{block}
+    \vspace{0.2cm}
+    \begin{exampleblock}{Run the Demo}
+      \texttt{uvicorn webapp.main:app --reload}\\
+      Open \texttt{http://localhost:8000}
+    \end{exampleblock}
+
+    \column{0.48\textwidth}
+    \begin{block}{Streamlit Demo (Alternative)}
+      \begin{itemize}
+        \item 5-tab interface: Inference, Batch, Comparison, Analysis, About
+        \item Interactive benchmark charts
+        \item \texttt{streamlit run app.py}
+      \end{itemize}
+    \end{block}
+    \vspace{0.2cm}
+    \begin{block}{Jupyter Notebook}
+      \begin{itemize}
+        \item Step-by-step inference on all 3 tasks
+        \item \texttt{notebooks/demo.ipynb}
+      \end{itemize}
+    \end{block}
+  \end{columns}
+\end{frame}
+
+% ----------------------------------------------------------
+\begin{frame}[shrink=8]{Repository Structure}
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \begin{block}{Source Code}
+      \small\ttfamily
+      \begin{tabular}{ll}
+        src/config.py          & Training config \\
+        src/data\_loader.py    & Dataset loading \\
+        src/model.py           & Model utilities \\
+        src/train\_bert.py     & BERT training \\
+        src/train\_t5.py       & T5 fine-tuning \\
+        src/pre\_train\_t5.py  & T5 pre-training \\
+        src/evaluate.py        & Evaluation \\
+        src/label\_dataset.py  & Auto-labeling \\
+        src/visualize.py       & Chart generation \\
+      \end{tabular}
+    \end{block}
+
+    \column{0.48\textwidth}
+    \begin{block}{Demo \& Scripts}
+      \small\ttfamily
+      \begin{tabular}{ll}
+        app.py                  & Streamlit demo \\
+        webapp/main.py          & FastAPI demo \\
+        notebooks/demo.ipynb    & Jupyter demo \\
+        scripts/run\_*.sh       & Training scripts \\
+        tests/                  & Unit tests \\
+      \end{tabular}
+    \end{block}
+    \vspace{0.2cm}
+    \begin{exampleblock}{Reproducibility}
+      \begin{itemize}
+        \item All models on \textbf{HuggingFace}
+        \item Shell scripts with CLI arguments
+        \item Random seed: 42
+        \item 35+ unit tests (\texttt{pytest})
       \end{itemize}
     \end{exampleblock}
   \end{columns}

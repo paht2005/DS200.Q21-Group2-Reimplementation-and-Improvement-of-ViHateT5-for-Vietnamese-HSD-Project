@@ -1,0 +1,96 @@
+/* ViHateT5 Demo — Custom Styles */
+
+/* ========== Base ========== */
+:root {
+  --uit: #00468C;
+  --uit-dark: #003264;
+  --uit-light: #DCE8FA;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #475569; }
+
+/* ========== Components ========== */
+.card {
+  @apply bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-shadow hover:shadow-md;
+}
+
+.input-control {
+  @apply rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-uit focus:border-transparent transition-all;
+}
+
+.select-control {
+  @apply rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-uit focus:border-transparent cursor-pointer transition-all;
+}
+
+.btn-primary {
+  @apply bg-uit hover:bg-uit-dark text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.sample-btn {
+  @apply px-3 py-1.5 text-xs font-medium rounded-lg border cursor-pointer transition-all hover:scale-105 active:scale-95;
+}
+
+/* Tabs */
+.tab-btn {
+  @apply px-3 py-1.5 text-xs font-medium rounded-md transition-all;
+}
+.tab-btn.active {
+  @apply bg-white dark:bg-gray-600 shadow-sm text-uit dark:text-white;
+}
+.tab-btn:not(.active) {
+  @apply text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300;
+}
+
+/* Radio selection */
+.task-radio-label:has(input:checked) {
+  @apply border-uit bg-uit/5 dark:bg-uit/20;
+}
+
+/* ========== Result labels ========== */
+.label-badge {
+  @apply inline-flex items-center px-4 py-2 rounded-full text-sm font-bold tracking-wide uppercase;
+}
+.label-CLEAN, .label-NONE { @apply bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300; }
+.label-OFFENSIVE         { @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300; }
+.label-HATE, .label-TOXIC { @apply bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300; }
+
+/* Hate span highlight */
+.hate-span {
+  @apply bg-red-500 text-white px-1 py-0.5 rounded font-semibold;
+}
+
+/* ========== Sidebar responsive ========== */
+@media (max-width: 1023px) {
+  .sidebar {
+    @apply fixed inset-y-0 left-0 z-40 -translate-x-full transition-transform duration-300;
+  }
+  .sidebar.open {
+    @apply translate-x-0;
+  }
+}
+
+/* ========== Animations ========== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInUp {
+  animation: fadeInUp 0.35s ease-out both;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 70, 140, 0.3); }
+  50%      { box-shadow: 0 0 0 8px rgba(0, 70, 140, 0); }
+}
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Prose table styling */
+.prose table { @apply w-full text-left; }
+.prose th { @apply bg-gray-100 dark:bg-gray-700 px-3 py-2 text-xs font-semibold uppercase tracking-wider; }
+.prose td { @apply px-3 py-2 border-t border-gray-200 dark:border-gray-700; }
