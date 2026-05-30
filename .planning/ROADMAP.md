@@ -29,14 +29,21 @@ Plans:
 ---
 
 ## Phase 2: Focal Loss Integration
-**Status**: `NOT_STARTED`
+**Status**: `IN_PROGRESS`
 **Priority**: HIGH
 **Estimated**: 2-3 hours
+**Requirements:** [IMP-02]
 
 ### Goals
 - Integrate focal loss vào T5 training pipeline
 - Add CLI flags for configuration
 - Document performance impact
+
+### Plans: 2 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Core integration: CLI args, trainer selection, shell script
+- [ ] 02-02-PLAN.md — Tests, documentation, and experiments with comparison table
 
 ### Tasks
 | ID | Task | File | Complexity |
