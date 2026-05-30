@@ -29,6 +29,7 @@ except LookupError:
     nltk.download('punkt_tab', quiet=True)
 
 from data_loader import load_dataset_by_name
+from focal_loss import FocalLossSeq2SeqTrainer
 
 # Set tokenizer parallelism to false
 os.environ["TOKENIZERS_PARALLELISM"] = 'False'
@@ -48,9 +49,20 @@ parser.add_argument('--warmup_ratio', type=float, default=0.0, help='Warmup rati
 parser.add_argument('--lr_scheduler_type', type=str, default='constant', help='Learning rate scheduler type')
 parser.add_argument('--seed', type=int, default=42, help='Random seed')
 parser.add_argument('--gpu', type=str, default='0', help='GPU number')
+parser.add_argument('--use_focal_loss', action='store_true', help='Use focal loss instead of standard CrossEntropy')
+parser.add_argument('--focal_gamma', type=float, default=2.0, help='Focal loss gamma parameter (focusing strength)')
+parser.add_argument('--label_smoothing', type=float, default=0.0, help='Label smoothing factor (0.0 = no smoothing)')
 
 # Parse arguments
 bash_args = parser.parse_args()
+
+# Validate focal loss arguments
+if not bash_args.use_focal_loss and (bash_args.focal_gamma != 2.0 or bash_args.label_smoothing != 0.0):
+    parser.error("--focal_gamma and --label_smoothing require --use_focal_loss flag")
+if bash_args.focal_gamma < 0:
+    parser.error("--focal_gamma must be >= 0")
+if bash_args.label_smoothing < 0.0 or bash_args.label_smoothing > 1.0:
+    parser.error("--label_smoothing must be between 0.0 and 1.0")
 
 # Define GPU
 os.environ["CUDA_VISIBLE_DEVICES"]=bash_args.gpu
@@ -380,15 +392,31 @@ def compute_metrics(eval_pred):
 
     return {'f1_macro': round(f1_macro * 100, 4), 'gen_len': round(gen_len_mean, 4)}
 
-trainer = Seq2SeqTrainer(
-    model=model,
-    args=training_args,
-    data_collator=data_collator,
-    train_dataset=train_tokenized_dataset,
-    eval_dataset=val_tokenized_dataset,
-    tokenizer=tokenizer,
-    compute_metrics=compute_metrics,
-)
+# Create trainer with conditional focal loss support
+if bash_args.use_focal_loss:
+    print(f'PROGRESS|Using Focal Loss (gamma={bash_args.focal_gamma}, smoothing={bash_args.label_smoothing})')
+    trainer = FocalLossSeq2SeqTrainer(
+        model=model,
+        args=training_args,
+        data_collator=data_collator,
+        train_dataset=train_tokenized_dataset,
+        eval_dataset=val_tokenized_dataset,
+        tokenizer=tokenizer,
+        compute_metrics=compute_metrics,
+        focal_gamma=bash_args.focal_gamma,
+        label_smoothing=bash_args.label_smoothing,
+    )
+else:
+    print('PROGRESS|Using standard CrossEntropy loss')
+    trainer = Seq2SeqTrainer(
+        model=model,
+        args=training_args,
+        data_collator=data_collator,
+        train_dataset=train_tokenized_dataset,
+        eval_dataset=val_tokenized_dataset,
+        tokenizer=tokenizer,
+        compute_metrics=compute_metrics,
+    )
 
 print('PROGRESS|Training...')
 trainer.train()

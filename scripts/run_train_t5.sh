@@ -16,6 +16,9 @@ WARMUP_RATIO=0.0
 LR_SCHEDULER="constant"
 SEED=42
 GPU="0"
+USE_FOCAL_LOSS=false
+FOCAL_GAMMA=2.0
+LABEL_SMOOTHING=0.0
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -72,6 +75,18 @@ while [[ $# -gt 0 ]]; do
             GPU="$2"
             shift 2
             ;;
+        --use_focal_loss)
+            USE_FOCAL_LOSS=true
+            shift 1
+            ;;
+        --focal_gamma)
+            FOCAL_GAMMA="$2"
+            shift 2
+            ;;
+        --label_smoothing)
+            LABEL_SMOOTHING="$2"
+            shift 2
+            ;;
         *)
             echo "Unknown option: $1"
             echo "Usage: bash scripts/run_train_t5.sh [options]"
@@ -100,8 +115,17 @@ echo "Warmup ratio: $WARMUP_RATIO"
 echo "LR scheduler: $LR_SCHEDULER"
 echo "Seed: $SEED"
 echo "GPU: $GPU"
+echo "Use focal loss: $USE_FOCAL_LOSS"
+echo "Focal gamma: $FOCAL_GAMMA"
+echo "Label smoothing: $LABEL_SMOOTHING"
 echo "=========================================="
 echo ""
+
+# Build focal loss arguments conditionally
+FOCAL_ARGS=""
+if [ "$USE_FOCAL_LOSS" = true ]; then
+    FOCAL_ARGS="--use_focal_loss --focal_gamma $FOCAL_GAMMA --label_smoothing $LABEL_SMOOTHING"
+fi
 
 # Run training
 python src/train_t5.py \
@@ -117,7 +141,8 @@ python src/train_t5.py \
     --warmup_ratio $WARMUP_RATIO \
     --lr_scheduler_type "$LR_SCHEDULER" \
     --seed $SEED \
-    --gpu "$GPU"
+    --gpu "$GPU" \
+    $FOCAL_ARGS
 
 echo ""
 echo "✅ Fine-tuning completed! Model saved to: $OUTPUT_DIR"
