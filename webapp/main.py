@@ -170,6 +170,12 @@ app = FastAPI(
 )
 
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+
+# Mount results images for the improvements page
+RESULTS_DIR = BASE_DIR.parent / "results"
+if (RESULTS_DIR / "images").exists():
+    app.mount("/results-assets", StaticFiles(directory=RESULTS_DIR / "images"), name="results-assets")
+
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 
@@ -188,6 +194,50 @@ async def index(request: Request):
             "device": device,
         },
     )
+
+
+@app.get("/results", response_class=HTMLResponse)
+async def results_page(request: Request):
+    """Improvement results page showing Phase 2-5 outcomes."""
+    focal_results = []
+    focal_columns = []
+    ensemble_results = []
+    ensemble_columns = []
+    mcnemar_results = []
+    mcnemar_columns = []
+
+    try:
+        focal_df = pd.read_csv(RESULTS_DIR / "focal_loss_comparison.csv")
+        focal_results = focal_df.to_dict("records")
+        focal_columns = focal_df.columns.tolist()
+    except FileNotFoundError:
+        pass
+
+    try:
+        ensemble_df = pd.read_csv(RESULTS_DIR / "ensemble_results.csv")
+        ensemble_results = ensemble_df.to_dict("records")
+        ensemble_columns = ensemble_df.columns.tolist()
+    except FileNotFoundError:
+        pass
+
+    try:
+        mcnemar_df = pd.read_csv(RESULTS_DIR / "analysis" / "mcnemar_results_vihsd.csv")
+        mcnemar_df["p_value"] = mcnemar_df["p_value"].apply(lambda x: f"{x:.6f}")
+        mcnemar_results = mcnemar_df.to_dict("records")
+        mcnemar_columns = mcnemar_df.columns.tolist()
+    except FileNotFoundError:
+        pass
+
+    context = {
+        "request": request,
+        "focal_results": focal_results,
+        "focal_columns": focal_columns,
+        "ensemble_results": ensemble_results,
+        "ensemble_columns": ensemble_columns,
+        "mcnemar_results": mcnemar_results,
+        "mcnemar_columns": mcnemar_columns,
+    }
+    return templates.TemplateResponse(request=request, name="results.html", context=context)
 
 
 @app.post("/api/predict")

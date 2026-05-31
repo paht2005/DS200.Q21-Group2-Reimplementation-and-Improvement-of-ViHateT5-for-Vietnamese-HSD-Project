@@ -1,0 +1,62 @@
+text,true_label,predicted_label,error_type
+Không thích cò lắm nhưng khôn như này thì điếm thúi quá.,OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+"Bạn so sánh như như cớt ấy. Bản chất so sánh là phải có 2 cái cùng giống nhau về bản chất mới so sánh được, đằng này:",OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+"Sau này bọn page 1 ăn mì tôm sẽ đéo bao giờ có gói gia vị, tao nguyền rủa",OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+Tham lại còn ngu,OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+Đó lòi bản chất rồi kia. Nói thiệt vô mấy 2 pic cafe gặp mấy thằng nhại nhại chê bai rồi lôi 1 cái cafe tây lol ra là biết bài của chúng nó ),OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+"Ngu thì thua, sai ở đâu thì sửa, mà làm lại. Ko bắt tay thì bị chửi kém bản lĩnh, hèn thôi. Cay cú nó đ liên quan lol gì đến việc bắt tay cả.",OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+26 27 con c nhé đ-éo tin,OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+dm thằng chồng gu mặn vcl,OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+@tuanbe1999 nó nói xấu fence nè. Gạch vỡ mõm nó đi,OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+"Chơi ngu rồi, động đến tôn giáo thì chuẩn bị tù thôi",OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+"đùa, cái shop thế mà cũng bảo chính hãng, vả vỡ alo nó đi. ra trung tâm thương mại, hay cửa hàng chính hãng mà mua.",OFFENSIVE,CLEAN,OFFENSIVE → CLEAN
+Thớt chỉ nói là hôi thôi chứ nó không nói là thúi. Nên nó vẫn còn lịch sự chán. Thứ Troll ghẻ ngu học không sõi tiếng việt mà còn bày đặt lên mặt. Còn đếch biết các cấp độ khi dùng từ,HATE,OFFENSIVE,HATE → OFFENSIVE
+Không thích cò lắm nhưng khôn như này thì điếm thúi quá.,HATE,CLEAN,HATE → CLEAN
+"Bạn so sánh như như cớt ấy. Bản chất so sánh là phải có 2 cái cùng giống nhau về bản chất mới so sánh được, đằng này:",HATE,CLEAN,HATE → CLEAN
+Con cẩu nô bày,HATE,OFFENSIVE,HATE → OFFENSIVE
+đcm mấy thằng chim ngắn phung phí cơ hội,HATE,OFFENSIVE,HATE → OFFENSIVE
+"Sau này bọn page 1 ăn mì tôm sẽ đéo bao giờ có gói gia vị, tao nguyền rủa",HATE,CLEAN,HATE → CLEAN
+"Thằng rách tốt đẹp gì, ở đây vẫn gọi nó là rách 5 củ, căn bản nó éo có cái gì để dìm thêm nữa, rác vẫn rác nhưng có 1 thằng bới rác thành rác cùng luôn là Cường nên người ta chửi thằng cha phông bạt k",HATE,OFFENSIVE,HATE → OFFENSIVE
+Chương 21: Chuyện thằng K,HATE,OFFENSIVE,HATE → OFFENSIVE
+"thách thức KH, coi KH là những con suxvat hạ đẳng ngu như bò, chữ cũng đéo biết đọc để sale BH lừa, sale BH là giống loài thượng đẳng",HATE,OFFENSIVE,HATE → OFFENSIVE
+Tham lại còn ngu,HATE,CLEAN,HATE → CLEAN
+"bọn Hồi giáo đấu tranh lúc nào cũng dính tới ""hành quyết"" man rợ, đã man rợ còn ghi lại hình ảnh tuyên truyền kiểu mất nhân tính thì sao mà giành được sự ủng hộ rộng rãi của quốc tế dc.",HATE,OFFENSIVE,HATE → OFFENSIVE
+Đó lòi bản chất rồi kia. Nói thiệt vô mấy 2 pic cafe gặp mấy thằng nhại nhại chê bai rồi lôi 1 cái cafe tây lol ra là biết bài của chúng nó ),HATE,CLEAN,HATE → CLEAN
+"Dis mẹ thằng thần kinh này. Hiện tại ô tô bị coi là ""nguồn nguy hiểm cao độ"" rồi, cứ tội vạ đúng sai gì cũng bị đè ra đấm rồi, chưa hài lòng mày hả ? Giờ tao chạy đúng luật, đúng làn, đúng tất cả mọi ",HATE,OFFENSIVE,HATE → OFFENSIVE
+"Ngu thì thua, sai ở đâu thì sửa, mà làm lại. Ko bắt tay thì bị chửi kém bản lĩnh, hèn thôi. Cay cú nó đ liên quan lol gì đến việc bắt tay cả.",HATE,CLEAN,HATE → CLEAN
+26 27 con c nhé đ-éo tin,HATE,CLEAN,HATE → CLEAN
+Thì tùy nick thôi thím. Ngứa mắt quá đôi khi ae cũng méo chịu được. Để ý anti đàn gà tuyệt nhiên ko có ai fan đội nào khác ngoài HN. Anti thì nhận mẹ nó anti đi. Toàn đội lốt fan HN làm éo gì mang tiế,HATE,OFFENSIVE,HATE → OFFENSIVE
+dm thằng chồng gu mặn vcl,HATE,CLEAN,HATE → CLEAN
+thằng óc chó,HATE,OFFENSIVE,HATE → OFFENSIVE
+"đúng là vozer, nhiều thằng sống ngu và ích kỷ vcl, nếu như người yêu nó cần 1 trái thận, lúc đó bản thân suy nghĩ tính toán thì ok, này chạy xe có 40km mà tính toán chi ly, mua cái váy mà mặc đi",HATE,OFFENSIVE,HATE → OFFENSIVE
+@tuanbe1999 nó nói xấu fence nè. Gạch vỡ mõm nó đi,HATE,CLEAN,HATE → CLEAN
+"Khác mẹ gì tàu khựa, bơm tiền cho đám NGO woke đi biểu tình phá lại bọn tây lông thôi. Chó chê mèo lắm lông. À mà acc Emma Roberts bị ban rồi à mày",HATE,OFFENSIVE,HATE → OFFENSIVE
+"Chơi ngu rồi, động đến tôn giáo thì chuẩn bị tù thôi",HATE,CLEAN,HATE → CLEAN
+"đùa, cái shop thế mà cũng bảo chính hãng, vả vỡ alo nó đi. ra trung tâm thương mại, hay cửa hàng chính hãng mà mua.",HATE,CLEAN,HATE → CLEAN
+"Sam đâu có ngu mà đạp đổ bát cơm, bớt thuyết âm mưu ngu lol đi. Màn của chính Samsung s20 còn dính lỗi nữa kìa",HATE,CLEAN,HATE → CLEAN
+Theart giống thằng bạn mình vl. Tháng vợ nó cũng cho 3tr mà tuần đéo nào cũng bia bọt 2 3 buổi. Thi thoảng lại cho lại vợ 1 củ )),HATE,CLEAN,HATE → CLEAN
+"cộm cán như ku rồng còn quay xe nửa năm trước chửi tập lọ óc chó zero ngu đần nhưng còn sót lại 2, 3 cháu như yolo, emma cho là sáng suốt lắm, để ca nhiễm ít, éo mẹ thế thì sáng suốt vs ca nhiễm ít ti",HATE,OFFENSIVE,HATE → OFFENSIVE
+"Thứ như vậy mà chơi với thằng chủ kênh cũng thuộc dạng không ra gì, thì chết đủ 5 đứa là 10 điểm đẹp, ăn hại xã hội rồi biết bao gia đình có thể tan nát vì cái đám trẻ trâu như thế này.",HATE,CLEAN,HATE → CLEAN
+Đkm mới đáp 1 bãi cứt vào mặt đã cúp đuôi chạy rồi. Phản kháng yếu ớt vl,HATE,CLEAN,HATE → CLEAN
+mem voz mà vẫn bị lừa thì chỉ có thể trách bạn quá ngu thôi,HATE,OFFENSIVE,HATE → OFFENSIVE
+"loại này mong nó chết cmnđ cho sạch đường, chứ hy vọng gì",HATE,CLEAN,HATE → CLEAN
+"Đậu má t chưa thấy thằng nào chơi cần nhiều mà giỏi cả, nói ngáo thì tin!",HATE,CLEAN,HATE → CLEAN
+Thằng này nó lập mấy thớt xàm loz ntn rồi. Chủ nhật chơi lá đu đủ ít thôi.,HATE,OFFENSIVE,HATE → OFFENSIVE
+sắp tết mà đéo có dư tiền tết này lại nằm nhà coi tv đánh lol thôi,HATE,CLEAN,HATE → CLEAN
+đù xamer về voz kể chuyện,HATE,CLEAN,HATE → CLEAN
+"bọn trẻ trâu manh động lắm, may cho fen ko bị mất tai lúc ý !",HATE,CLEAN,HATE → CLEAN
+"Nghe thằng này nói là biết chưa chạy xe bao giờ Con Morning máy nhỏ nhưng khoản hao xăng thì đéo thua bố con thằng nào. Con i10 rộng thật, nhưng máy nhỏ hơn, lại đéo có cân bằng điện tử bập vào làm cm",HATE,CLEAN,HATE → CLEAN
+qua thớt này của nó thì 90% là xiaolol rùi,HATE,OFFENSIVE,HATE → OFFENSIVE
+"thằng này chuyên đăng bài để hả hê, khóa mõm nó đi mod",HATE,OFFENSIVE,HATE → OFFENSIVE
+"Đm ý nó là ko mưa nó đi với thằng kia, mưa thì đi với thím Ngu như bò",HATE,CLEAN,HATE → CLEAN
+người chim voz cũ đây à suốt ngày quay tay ra thớt nhảm,HATE,CLEAN,HATE → CLEAN
+Ko hiểu con này lấy data từ đâu mà nó nói chuyện “con người” thế nhỉ? Trong khi Google có kho data siêu to khổng lồ thì con trợ lý lại khô khan vãi cả ra,HATE,CLEAN,HATE → CLEAN
+Vào đọc toàn lũ voz xạo lìn là giỏi.,HATE,OFFENSIVE,HATE → OFFENSIVE
+"Gọi tổng đài bảo nó cho số thằng sếp càng cao càng tốt rồi gọi lên bảo : bố mày không vay, thằng nào con nào chống lưng bọn mày mà láo chó vậy. Làm phiền nữa bố thịt cả nhà mày cho hết gọi",HATE,OFFENSIVE,HATE → OFFENSIVE
+Có đứa con là mừng rồi mày. Sợ cái lol. Nghĩ đéo gì cho đau đầu. Cưới xong học tiếp. Ai cấm đâu.,HATE,CLEAN,HATE → CLEAN
+Gif 2 con chó sủa nhau qua cái cổng không đóng ai up lên hộ cái.,HATE,CLEAN,HATE → CLEAN
+t hy vọng cụ perez ko bao h động vào thằng chó mp3 nữa. Nó ko xứng đáng. Giờ trên ttcn còn cầu thủ tấn công tier 1 nào thì hốt chứ mua kane làm lol gì già chết mẹ,HATE,CLEAN,HATE → CLEAN
+"Già đầu bớt sân si đi, không muốn nó tự ý dắt xe đi thì 1 là cất xe vào trong nhà 2 là giải quyết với thằng đấy thôi. Post lên đây giải quyết cc gì? Tìm kiếm người đồng cảm với mình à. Lội mấy trang c",HATE,CLEAN,HATE → CLEAN
+"Đm nhẫm vào đuổi con bò đỏ này nó giãy nảy cắn người kinh thật @@ Tao có hay ko liên quan lol gì mà mày có vẻ cay cú vkl nhỉ, chắc gato với tao hả ))",HATE,OFFENSIVE,HATE → OFFENSIVE
+"gạch tên hộ khẩu, cho nó ra đường ở mấy thằng cờ bạc, cá độ méo tin được thằng nào",HATE,CLEAN,HATE → CLEAN
+Lào giờ đến Pakistan toàn chết bởi bẫy nợ bọn Tàu .,HATE,OFFENSIVE,HATE → OFFENSIVE

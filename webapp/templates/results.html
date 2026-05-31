@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ViHateT5 — Improvement Results</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['class', '[data-theme="dark"]'],
+      theme: {
+        extend: {
+          colors: {
+            uit: { DEFAULT: '#00468C', dark: '#003264', light: '#DCE8FA', accent: '#1a73e8' },
+            hate: '#dc3545',
+            offensive: '#ffc107',
+            clean: '#28a745',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 p-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-uit">📈 Improvement Results</h1>
+      <a href="/" class="bg-uit text-white px-4 py-2 rounded-lg text-sm hover:bg-uit-dark transition-colors">← Back to Demo</a>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-6 space-y-8">
+
+    <!-- Section 1: Focal Loss -->
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+      <h2 class="text-xl font-bold mb-4">🎯 Focal Loss vs Cross-Entropy</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">So sánh hiệu suất giữa Cross-Entropy loss và Focal Loss (γ=2, α=0.25) trên tập ViHSD.</p>
+      {% if focal_results %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr>
+              {% for col in focal_columns %}
+              <th class="px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 font-semibold text-left">{{ col }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in focal_results %}
+            <tr>
+              {% for col in focal_columns %}
+              <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">{{ row[col] }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-gray-500">No focal loss comparison data available.</p>
+      {% endif %}
+    </section>
+
+    <!-- Section 2: Ensemble Results -->
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+      <h2 class="text-xl font-bold mb-4">🤝 Model Ensemble Results</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Kết hợp dự đoán từ nhiều mô hình (T5 + BERT) sử dụng Weighted Voting và Majority Voting.</p>
+      {% if ensemble_results %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr>
+              {% for col in ensemble_columns %}
+              <th class="px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 font-semibold text-left">{{ col }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in ensemble_results %}
+            <tr>
+              {% for col in ensemble_columns %}
+              <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">{{ row[col] }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-gray-500">No ensemble results data available.</p>
+      {% endif %}
+    </section>
+
+    <!-- Section 3: McNemar Tests -->
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+      <h2 class="text-xl font-bold mb-4">📊 McNemar Statistical Significance</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Kiểm định McNemar so sánh từng cặp mô hình — xác định sự khác biệt có ý nghĩa thống kê (p &lt; 0.05).</p>
+      {% if mcnemar_results %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr>
+              {% for col in mcnemar_columns %}
+              <th class="px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 font-semibold text-left">{{ col }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in mcnemar_results %}
+            <tr>
+              {% for col in mcnemar_columns %}
+              <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-700 {% if col == 'significant' and row[col] == true %}text-green-600 font-semibold{% endif %}">{{ row[col] }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-gray-500">No McNemar test results available.</p>
+      {% endif %}
+    </section>
+
+    <!-- Section 4: Combined Comparison Chart -->
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+      <h2 class="text-xl font-bold mb-4">📈 Combined Model Comparison</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Biểu đồ so sánh tổng hợp tất cả mô hình trên các metrics chính.</p>
+      <img src="/results-assets/combined_comparison.png" alt="Combined comparison chart" class="rounded-lg shadow w-full" />
+    </section>
+
+    <!-- Section 5: Confusion Matrices -->
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+      <h2 class="text-xl font-bold mb-4">🔍 Confusion Matrices</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Ma trận nhầm lẫn cho từng mô hình trên tập ViHSD.</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <img src="/results-assets/confusion_matrix_vihsd_vit5_finetune_balanced.png" alt="Confusion matrix — vit5_finetune_balanced" class="rounded-lg shadow w-full" />
+        <img src="/results-assets/confusion_matrix_vihsd_vit5_focal_loss_exp.png" alt="Confusion matrix — vit5_focal_loss_exp" class="rounded-lg shadow w-full" />
+        <img src="/results-assets/confusion_matrix_vihsd_vihatet5_reimpl.png" alt="Confusion matrix — vihatet5_reimpl" class="rounded-lg shadow w-full" />
+        <img src="/results-assets/confusion_matrix_vihsd_vit5_finetune_hate_only.png" alt="Confusion matrix — vit5_finetune_hate_only" class="rounded-lg shadow w-full" />
+        <img src="/results-assets/confusion_matrix_vihsd_vit5_finetune_multi.png" alt="Confusion matrix — vit5_finetune_multi" class="rounded-lg shadow w-full" />
+        <img src="/results-assets/confusion_matrix_vihsd_visobert_labeling.png" alt="Confusion matrix — visobert_labeling" class="rounded-lg shadow w-full" />
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center text-sm text-gray-500 dark:text-gray-400 py-6">
+    DS200.Q21 — Big Data Analysis — Group 02 | University of Information Technology (UIT — VNU-HCM)
+  </footer>
+
+</body>
+</html>

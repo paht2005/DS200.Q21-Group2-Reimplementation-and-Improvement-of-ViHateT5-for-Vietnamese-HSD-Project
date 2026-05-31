@@ -16,6 +16,7 @@ from sklearn.metrics import (
     confusion_matrix, classification_report, f1_score,
     precision_score, recall_score, accuracy_score
 )
+from scipy.stats import chi2 as chi2_dist
 
 
 RESULTS_DIR = "results/images"
@@ -113,7 +114,7 @@ def plot_per_class_f1(vihsd_report, victsd_report, filename="per_class_f1_breakd
     print(f"  Saved: {filepath}")
 
 
-def analyze_misclassifications(texts, y_true, y_pred, class_names, task_name, top_n=10):
+def analyze_misclassifications(texts, y_true, y_pred, class_names, task_name, top_n=10, model_name=None):
     """Identify and categorize misclassification patterns."""
     mismatches = []
     for i, (true, pred) in enumerate(zip(y_true, y_pred)):
@@ -122,7 +123,7 @@ def analyze_misclassifications(texts, y_true, y_pred, class_names, task_name, to
                 "text": texts[i][:200],  # Truncate long texts
                 "true_label": class_names[true],
                 "predicted_label": class_names[pred],
-                "error_type": f"{class_names[true]} → {class_names[pred]}",
+                "error_type": f"{class_names[true]} \u2192 {class_names[pred]}",
             })
 
     df = pd.DataFrame(mismatches)
@@ -137,9 +138,9 @@ def analyze_misclassifications(texts, y_true, y_pred, class_names, task_name, to
     for err_type, count in error_dist.items():
         print(f"    {err_type}: {count} ({count/len(df)*100:.1f}%)")
 
-    # Save top-N failure cases
-    top_failures = df.head(top_n)
-    filepath = os.path.join(ANALYSIS_DIR, f"{task_name.lower()}_failure_cases.csv")
+    # Save failure cases
+    suffix = f"_{model_name}" if model_name else ""
+    filepath = os.path.join(ANALYSIS_DIR, f"{task_name.lower()}_failure_cases{suffix}.csv")
     df.to_csv(filepath, index=False, encoding="utf-8")
     print(f"  Saved all {len(df)} failure cases: {filepath}")
 
@@ -237,15 +238,138 @@ def statistical_significance_report(results_dict, filename="statistical_signific
     return df
 
 
+def mcnemar_test(y_true, preds_a, preds_b):
+    """Compute McNemar's chi-squared statistic with continuity correction.
+
+    Compares two models on the same test set.
+    Returns: (chi2_statistic, p_value, n01, n10)
+      - n01: A correct & B wrong
+      - n10: A wrong & B correct
+    """
+    y_true = np.asarray(y_true)
+    preds_a = np.asarray(preds_a)
+    preds_b = np.asarray(preds_b)
+
+    a_correct = (preds_a == y_true)
+    b_correct = (preds_b == y_true)
+
+    n01 = int(np.sum(a_correct & ~b_correct))  # A correct, B wrong
+    n10 = int(np.sum(~a_correct & b_correct))  # A wrong, B correct
+
+    if n01 + n10 == 0:
+        return (0.0, 1.0, 0, 0)
+
+    chi2 = (abs(n01 - n10) - 1) ** 2 / (n01 + n10)
+    p_value = float(chi2_dist.sf(chi2, df=1))
+
+    return (float(chi2), p_value, n01, n10)
+
+
+def mcnemar_report(test_pairs, y_true, predictions_dict, task_name, filename="mcnemar_results.csv"):
+    """Run McNemar's test for each pair and save results.
+
+    Args:
+        test_pairs: list of tuples (model_a_name, model_b_name)
+        y_true: ground truth labels
+        predictions_dict: dict mapping model_name -> list of predicted labels
+        task_name: task identifier for the report
+        filename: output CSV filename
+
+    Returns:
+        DataFrame with McNemar results
+    """
+    ensure_dirs()
+    rows = []
+    for model_a, model_b in test_pairs:
+        if model_a not in predictions_dict or model_b not in predictions_dict:
+            continue
+        chi2, p_value, n01, n10 = mcnemar_test(
+            y_true, predictions_dict[model_a], predictions_dict[model_b]
+        )
+        rows.append({
+            "model_a": model_a,
+            "model_b": model_b,
+            "task": task_name,
+            "chi2": round(chi2, 4),
+            "p_value": round(p_value, 6),
+            "n01": n01,
+            "n10": n10,
+            "significant": p_value < 0.05,
+            "reliable": (n01 + n10) >= 25,
+        })
+
+    df = pd.DataFrame(rows)
+    filepath = os.path.join(ANALYSIS_DIR, filename)
+    df.to_csv(filepath, index=False)
+    print(f"\n  McNemar's Test Results ({task_name}):")
+    print(df.to_string(index=False))
+    print(f"  Saved: {filepath}")
+    return df
+
+
+def plot_combined_comparison(results_df, output_path="results/images/combined_comparison.png"):
+    """Create grouped bar chart comparing all models + ensemble across tasks.
+
+    Args:
+        results_df: DataFrame with columns: model_name, task, macro_f1
+        output_path: path to save the chart
+    """
+    ensure_dirs()
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    tasks = results_df["task"].unique()
+    models = results_df["model_name"].unique()
+    n_tasks = len(tasks)
+    n_models = len(models)
+
+    x = np.arange(n_models)
+    width = 0.8 / n_tasks
+    colors = ["#3498db", "#e74c3c", "#2ecc71", "#f39c12"][:n_tasks]
+
+    for i, task in enumerate(tasks):
+        task_data = results_df[results_df["task"] == task]
+        values = []
+        for model in models:
+            row = task_data[task_data["model_name"] == model]
+            values.append(row["macro_f1"].values[0] if len(row) > 0 else 0)
+        offset = (i - n_tasks / 2 + 0.5) * width
+        bars = ax.bar(x + offset, values, width, label=task, color=colors[i], edgecolor="black", linewidth=0.5)
+        for bar, val in zip(bars, values):
+            if val > 0:
+                ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.005,
+                        f"{val:.3f}", ha="center", va="bottom", fontsize=8, fontweight="bold")
+
+    ax.set_xlabel("Model")
+    ax.set_ylabel("Macro F1-Score")
+    ax.set_title("Model Comparison \u2014 Macro F1 (All Models + Ensemble)")
+    ax.set_xticks(x)
+    ax.set_xticklabels(models, rotation=30, ha="right", fontsize=9)
+    ax.legend()
+    ax.set_ylim(0, 1.0)
+
+    fig.tight_layout()
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    fig.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  Saved: {output_path}")
+
+
 def run_full_error_analysis(
     vihsd_true, vihsd_pred, vihsd_texts,
-    victsd_true, victsd_pred, victsd_texts,
+    victsd_true=None, victsd_pred=None, victsd_texts=None,
+    model_name=None,
 ):
-    """Run complete error analysis pipeline."""
+    """Run complete error analysis pipeline.
+
+    Args:
+        model_name: Optional suffix for output filenames (enables per-model outputs).
+    """
     ensure_dirs()
 
+    suffix = f"_{model_name}" if model_name else ""
+
     print("\n" + "=" * 80)
-    print("ERROR ANALYSIS — ViHateT5")
+    print(f"ERROR ANALYSIS — ViHateT5{f' ({model_name})' if model_name else ''}")
     print("=" * 80)
 
     # --- ViHSD ---
@@ -255,43 +379,52 @@ def run_full_error_analysis(
         vihsd_true, vihsd_pred,
         labels=[0, 1, 2], class_names=vihsd_classes,
         title="ViHSD — Hate Speech Detection",
-        filename="confusion_matrix_vihsd.png"
+        filename=f"confusion_matrix_vihsd{suffix}.png"
     )
 
-    print("\n[2/6] ViCTSD Confusion Matrix")
-    victsd_classes = ["NONE", "TOXIC"]
-    plot_confusion_matrix(
-        victsd_true, victsd_pred,
-        labels=[0, 1], class_names=victsd_classes,
-        title="ViCTSD — Toxic Speech Detection",
-        filename="confusion_matrix_victsd.png"
-    )
+    victsd_report = None
+    if victsd_true is not None and victsd_pred is not None:
+        print("\n[2/6] ViCTSD Confusion Matrix")
+        victsd_classes = ["NONE", "TOXIC"]
+        plot_confusion_matrix(
+            victsd_true, victsd_pred,
+            labels=[0, 1], class_names=victsd_classes,
+            title="ViCTSD — Toxic Speech Detection",
+            filename=f"confusion_matrix_victsd{suffix}.png"
+        )
 
     print("\n[3/6] Per-Class F1 Reports")
     vihsd_report = per_class_f1_report(vihsd_true, vihsd_pred, vihsd_classes, "ViHSD")
-    victsd_report = per_class_f1_report(victsd_true, victsd_pred, victsd_classes, "ViCTSD")
+    if victsd_true is not None and victsd_pred is not None:
+        victsd_classes = ["NONE", "TOXIC"]
+        victsd_report = per_class_f1_report(victsd_true, victsd_pred, victsd_classes, "ViCTSD")
 
     print("\n[4/6] Per-Class F1 Charts")
-    plot_per_class_f1(vihsd_report, victsd_report)
+    if victsd_report is not None:
+        plot_per_class_f1(vihsd_report, victsd_report, filename=f"per_class_f1_breakdown{suffix}.png")
 
     print("\n[5/6] Misclassification Analysis")
     vihsd_errors = analyze_misclassifications(
-        vihsd_texts, vihsd_true, vihsd_pred, vihsd_classes, "ViHSD"
+        vihsd_texts, vihsd_true, vihsd_pred, vihsd_classes, "ViHSD", model_name=model_name
     )
-    victsd_errors = analyze_misclassifications(
-        victsd_texts, victsd_true, victsd_pred, victsd_classes, "ViCTSD"
-    )
-    plot_error_distribution(vihsd_errors, victsd_errors)
+    victsd_errors = pd.DataFrame()
+    if victsd_true is not None and victsd_pred is not None and victsd_texts is not None:
+        victsd_classes = ["NONE", "TOXIC"]
+        victsd_errors = analyze_misclassifications(
+            victsd_texts, victsd_true, victsd_pred, victsd_classes, "ViCTSD", model_name=model_name
+        )
+    plot_error_distribution(vihsd_errors, victsd_errors, filename=f"error_distribution{suffix}.png")
 
     print("\n[6/6] Statistical Significance (Bootstrap 95% CI)")
-    statistical_significance_report({
-        "ViHSD": (vihsd_true, vihsd_pred),
-        "ViCTSD": (victsd_true, victsd_pred),
-    })
+    sig_results = {"ViHSD": (vihsd_true, vihsd_pred)}
+    if victsd_true is not None and victsd_pred is not None:
+        sig_results["ViCTSD"] = (victsd_true, victsd_pred)
+    statistical_significance_report(sig_results, filename=f"statistical_significance{suffix}.csv")
 
     # Save per-class reports as CSV
-    vihsd_report.to_csv(os.path.join(ANALYSIS_DIR, "vihsd_per_class_report.csv"))
-    victsd_report.to_csv(os.path.join(ANALYSIS_DIR, "victsd_per_class_report.csv"))
+    vihsd_report.to_csv(os.path.join(ANALYSIS_DIR, f"vihsd_per_class_report{suffix}.csv"))
+    if victsd_report is not None:
+        victsd_report.to_csv(os.path.join(ANALYSIS_DIR, f"victsd_per_class_report{suffix}.csv"))
 
     print("\n" + "=" * 80)
     print("Error analysis complete! Results saved to results/analysis/ and results/images/")

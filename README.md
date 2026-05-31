@@ -127,23 +127,55 @@ Key resources developed in this project:
 
 ## **Repository Structure**
 
+> Files and folders marked with `[gitignored]` are excluded from version control. Model weights and raw data must be downloaded separately (see [Installation](#installation)).
+
 ```
 DS200.Q21_Project/
 ├── README.md                         # Project documentation (this file)
+├── LICENSE                           # MIT License
 ├── requirements.txt                  # Python dependencies
 ├── setup.py                          # Package setup
 ├── paper.pdf                         # Original ViHateT5 paper (ACL 2024)
 ├── .env.example                      # Template for environment variables
+├── .env                              # Environment variables          [gitignored]
 ├── .gitignore                        # Git exclusion rules
 │
+├── data/                             # Dataset CSV files              [gitignored]
+│   ├── data.csv                      # Main training/test dataset
+│   ├── data_balance.csv              # Class-balanced dataset
+│   ├── data_full_date.csv            # Full dataset with date metadata
+│   └── vihsd_sample.csv             # Small sample for quick testing
+│
 ├── docs/                             # Course reports and slides
-│   ├── report.pdf
-│   └── slide.pdf
+│   ├── DS200.Q21-Group2.tex          # LaTeX source of the course report
+│   └── DS200.Q21-Group2-Slide.pdf    # Slide presentation
+│
+├── logs/                             # Training logs
+│   ├── focal_loss_train.log          # Focal loss experiment training log
+│   └── train.pid                     # Training process ID (PID file)
+│
+├── reference/                        # Reference materials (prior work)
+│   ├── CS221_nhom11_report.pdf       # Reference report
+│   ├── CS221_nhom11_slide.pdf        # Reference slides
+│   ├── CS221_nhom11_ung_dung_vihatet5.mp4  # Reference demo video
+│   ├── Readme.docx                   # Reference notes
+│   └── code/                         # Reference source code
 │
 ├── results/                          # Experiment results and media assets
 │   ├── thumbnail.png                 # Project thumbnail image
+│   ├── ensemble_results.csv          # Ensemble experiment results
+│   ├── evaluation_results.csv        # Full model evaluation results
+│   ├── focal_loss_comparison.csv     # CE vs Focal Loss comparison
 │   ├── images/                       # Result figures and charts
-│   └── videos/                       # Demo videos
+│   │   ├── average_mf1_ranking.png
+│   │   ├── demo_webapp.png
+│   │   ├── model_comparison_macro_f1.png
+│   │   ├── pretrain_data_ratio_impact.png
+│   │   ├── radar_top3_models.png
+│   │   └── t5_comparison_macro_f1.png
+│   └── test/                         # Sample inference outputs
+│       ├── sample_inference_outputs.csv
+│       └── sample_inference_report.txt
 │
 ├── scripts/                          # Shell scripts and CLI tools
 │   ├── download_models.py            # Download all models from HuggingFace
@@ -183,8 +215,9 @@ DS200.Q21_Project/
 │   ├── templates/
 │   │   └── index.html                # Jinja2 HTML template (Tailwind CSS)
 │   └── static/
-│       ├── css/style.css             # Custom stylesheet
-│       └── js/app.js                 # Client-side JavaScript
+│       ├── css/                      # Custom stylesheets
+│       ├── images/                   # Static images for the web UI
+│       └── js/                       # Client-side JavaScript
 │
 ├── notebooks/                        # Jupyter notebooks
 │   ├── demo.ipynb                    # Interactive demo for inference on 3 tasks
@@ -192,19 +225,23 @@ DS200.Q21_Project/
 │
 ├── tests/                            # Unit tests and quality gates
 │   ├── README.md                     # Testing guide (pytest, branch, PR workflow)
+│   ├── __init__.py
 │   ├── conftest.py                   # Shared pytest fixtures
+│   ├── test_augment.py               # Data augmentation tests
 │   ├── test_config.py                # TrainConfig dataclass tests
 │   ├── test_data_loader.py           # TextDataset and dataset routing tests
+│   ├── test_ensemble_cli.py          # Ensemble CLI tests
 │   ├── test_evaluate.py              # T5 evaluation helper tests
+│   ├── test_focal_loss.py            # Focal loss implementation tests
 │   ├── test_inference.py             # Encoder inference tests
 │   ├── test_model.py                 # Model building utility tests
-│   ├── test_utils.py                 # Metrics and seed tests
-│   ├── test_t5_collator.py           # Span corruption collator tests
 │   ├── test_project_structure.py     # Project structure validation
+│   ├── test_quality_gates.py         # Quality gates (secrets, consistency)
 │   ├── test_scripts_guard.py         # Shell script safety guards
-│   └── test_quality_gates.py         # Quality gates (secrets, consistency)
+│   ├── test_t5_collator.py           # Span corruption collator tests
+│   └── test_utils.py                 # Metrics and seed tests
 │
-└── models/                           # Pre-trained & fine-tuned model weights (gitignored)
+└── models/                           # Pre-trained & fine-tuned model weights  [gitignored]
     ├── vihatet5_reimpl/              # Reimplemented ViHateT5
     ├── visobert_labeling/            # ViSoBERT model for auto-labeling
     ├── vit5_finetune_balanced/       # Fine-tuned ViT5 (balanced checkpoint)
@@ -213,7 +250,7 @@ DS200.Q21_Project/
     ├── vit5_focal_loss_exp/          # Fine-tuned ViT5 with Focal Loss (γ=2.0)
     ├── vit5_pretrain_balanced/       # Pre-trained ViT5 (200K balanced samples)
     └── vit5_pretrain_hate_only/      # Pre-trained ViT5 (100K hate-only samples)
-    # All model weights are excluded from git; download from HuggingFace collection above
+    #All model weights are excluded from git; download from HuggingFace collection above: https://huggingface.co/collections/NCPhat2005/ds200q21-big-data-analysis-group-2
 ```
 
 ---
@@ -478,6 +515,53 @@ python scripts/run_ensemble.py --data-file data/vihsd_sample.csv
 | **Ensemble** | **majority** | 0.7701 | 0.5317 | 0.8750 | 0.0000 | 0.7200 |
 
 > **Note**: The `visobert_labeling` model is a 2-class BERT model (NONE/HATE). For the 3-class ViHSD task, predictions are remapped: class 0 (NONE) → 0 (CLEAN), class 1 (HATE) → 2 (HATE). The OFFENSIVE class (1) is never predicted by this model.
+
+### 10. Error Analysis
+
+Generates confusion matrices, bootstrap confidence intervals, McNemar significance tests, and failure case studies comparing model pairs.
+
+#### Usage
+
+```bash
+# Run full analysis on all preset models
+python scripts/run_error_analysis.py
+
+# Analyze specific models only
+python scripts/run_error_analysis.py --models models/vit5_finetune_balanced models/vit5_focal_loss_exp
+
+# Run on ViCTSD task
+python scripts/run_error_analysis.py --task victsd
+
+# Skip bootstrap (faster)
+python scripts/run_error_analysis.py --no-bootstrap
+```
+
+#### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `--models` | paths | preset (6 models) | Custom model paths to analyze |
+| `--task` | choice | `vihsd` | Task: `vihsd` or `victsd` |
+| `--output-dir` | path | `results/analysis` | Directory for analysis outputs |
+| `--no-bootstrap` | flag | off | Skip bootstrap confidence intervals |
+| `--n-bootstrap` | int | 1000 | Number of bootstrap iterations |
+
+#### Output
+
+Results saved to `results/analysis/` including confusion matrices (`results/images/confusion_matrix_vihsd_*.png`), error distribution charts (`results/images/error_distribution_*.png`), and McNemar test CSV (`results/analysis/mcnemar_results_vihsd.csv`).
+
+### 11. Improvement Results Summary
+
+Summary of model-centric improvements over the baseline ViHateT5 reimplementation on ViHSD task.
+
+| Method | Accuracy | Macro F1 | Notes |
+|--------|----------|----------|-------|
+| Baseline (CrossEntropy) | 0.8882 | 0.5198 | Standard T5 fine-tuning |
+| Focal Loss (γ=2) | 0.9172 | 0.7478 | +43.9% Macro F1 improvement |
+| Ensemble (Weighted) | 0.8046 | 0.6346 | 3-model weighted voting |
+| Ensemble (Majority) | 0.7701 | 0.5317 | 3-model majority voting |
+
+> See `results/images/combined_comparison.png` for visual comparison and `notebooks/improvements.ipynb` for detailed analysis.
 
 ### Training Configurations
 

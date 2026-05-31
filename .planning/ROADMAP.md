@@ -129,7 +129,7 @@ Plans:
 ---
 
 ## Phase 5: Error Analysis & Visualization
-**Status**: `PLANNED`
+**Status**: `COMPLETED`
 **Priority**: MEDIUM
 **Estimated**: 2-3 hours
 **Requirements:** [REQ-03]
@@ -142,39 +142,54 @@ Plans:
 ### Plans: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Add McNemar's test, combined comparison chart, per-model filename support to src/error_analysis.py
-- [ ] 05-02-PLAN.md — Rewrite CLI for multi-model analysis with BERT support, prediction caching, McNemar, combined chart
+- [x] 05-01-PLAN.md — Add McNemar's test, combined comparison chart, per-model filename support to src/error_analysis.py
+- [x] 05-02-PLAN.md — Rewrite CLI for multi-model analysis with BERT support, prediction caching, McNemar, combined chart
 
 ### Success Criteria
-- [ ] Confusion matrices generated for all 5 models
-- [ ] Per-class F1 bar charts per model
-- [ ] McNemar significance test results (star pattern + ensemble)
-- [ ] Combined comparison chart (all models + ensemble)
-- [ ] All saved to `results/images/` and `results/analysis/`
+- [x] Confusion matrices generated for all 5 models
+- [x] Per-class F1 bar charts per model
+- [x] McNemar significance test results (star pattern + ensemble)
+- [x] Combined comparison chart (all models + ensemble)
+- [x] All saved to `results/images/` and `results/analysis/`
 
 ---
 
 ## Phase 6: Documentation & Demo
-**Status**: `NOT_STARTED`
+**Status**: `COMPLETED`
 **Priority**: LOW
-**Estimated**: 2-3 hours
+**Estimated**: 3-4 hours
 
 ### Goals
-- Update README với all new features
+- Update README với all new features (focal loss, augmentation, ensemble, error analysis)
+- Update Streamlit app (`app.py`) với improvement results (Phase 2-5), ensemble demo, error analysis visualizations
+- Update FastAPI webapp (`webapp/`) để hiển thị kết quả mới: ensemble, McNemar, combined comparison chart
 - Create demo notebook
+
+### Plans: 1 plan
+
+Plans:
+- [x] 06-01-PLAN.md — README sections 10-11, Streamlit Improvements tab, FastAPI /results route, improvements notebook
 
 ### Tasks
 | ID | Task | File | Complexity |
 |----|------|------|------------|
 | 6.1 | Update Usage section | `README.md` | Low |
-| 6.2 | Add experiment tables | `README.md` | Medium |
-| 6.3 | Create improvements notebook | `notebooks/improvements.ipynb` | Medium |
-| 6.4 | Update Limitations section | `README.md` | Low |
+| 6.2 | Add experiment tables (focal loss, ensemble, error analysis) | `README.md` | Medium |
+| 6.3 | Add improvement results tab to Streamlit app | `app.py` | Medium |
+| 6.4 | Add ensemble demo to Streamlit app | `app.py` | Medium |
+| 6.5 | Add error analysis visualizations to Streamlit app | `app.py` | Medium |
+| 6.6 | Update FastAPI webapp with improvement results page | `webapp/main.py`, `webapp/templates/` | Medium |
+| 6.7 | Add ensemble + McNemar results to FastAPI webapp | `webapp/main.py`, `webapp/templates/` | Medium |
+| 6.8 | Create improvements notebook | `notebooks/improvements.ipynb` | Medium |
+| 6.9 | Update Limitations section | `README.md` | Low |
 
 ### Success Criteria
-- [ ] README documents all features
-- [ ] Notebook runs end-to-end
-- [ ] Experiment results visible
+- [x] README documents all features (focal loss, augmentation, ensemble, error analysis)
+- [x] Streamlit app shows Phase 2-5 improvement results and comparison charts
+- [x] Streamlit app supports ensemble inference demo
+- [x] FastAPI webapp displays improvement results, ensemble, and error analysis
+- [x] Notebook runs end-to-end
+- [x] Experiment results visible in all interfaces
 
 ---
 

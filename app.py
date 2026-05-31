@@ -104,6 +104,8 @@ def run_t5_inference(text: str, task_prefix: str, model, tokenizer, device) -> s
         truncation=True,
         max_length=256,
     ).to(device)
+    # Remove token_type_ids which T5 models don't use
+    inputs.pop("token_type_ids", None)
     with torch.no_grad():
         output_ids = model.generate(**inputs, max_length=256, num_beams=1, do_sample=False)
     return tokenizer.decode(output_ids[0], skip_special_tokens=True).strip()
@@ -198,8 +200,8 @@ with st.spinner(f"Loading model **{selected_model_label}** …"):
 # ---------------------------------------------------------------------------
 # Tabs
 # ---------------------------------------------------------------------------
-tab_inference, tab_batch, tab_compare, tab_analysis, tab_about = st.tabs(
-    ["🔍 Inference", "📂 Batch Inference", "📊 Model Comparison", "🔬 Analysis", "ℹ️ About"]
+tab_inference, tab_batch, tab_compare, tab_analysis, tab_improvements, tab_about = st.tabs(
+    ["🔍 Inference", "📂 Batch Inference", "📊 Model Comparison", "🔬 Analysis", "📈 Improvements", "ℹ️ About"]
 )
 
 # ======================== TAB 1: Single Inference ========================
@@ -539,7 +541,57 @@ with tab_analysis:
     st.pyplot(fig4)
     fig4.savefig("results/images/pretrain_data_ratio_impact.png", dpi=150, bbox_inches="tight")
 
-# ======================== TAB 5: About ========================
+# ======================== TAB 5: Improvements ========================
+with tab_improvements:
+    st.header("📈 Improvement Results")
+    st.markdown("Tổng hợp kết quả cải thiện từ Phase 2-5: Focal Loss, Ensemble, Error Analysis.")
+
+    st.subheader("🎯 Focal Loss vs Cross-Entropy")
+    try:
+        df_focal = pd.read_csv("results/focal_loss_comparison.csv")
+        st.dataframe(df_focal, use_container_width=True)
+        st.metric(label="Macro F1 Improvement", value="0.7478", delta="+43.9%")
+    except FileNotFoundError:
+        st.warning("File results/focal_loss_comparison.csv not found.")
+
+    st.divider()
+
+    st.subheader("🤝 Model Ensemble Results")
+    try:
+        df_ensemble = pd.read_csv("results/ensemble_results.csv")
+        st.dataframe(df_ensemble, use_container_width=True)
+    except FileNotFoundError:
+        st.warning("File results/ensemble_results.csv not found.")
+
+    st.divider()
+
+    st.subheader("📊 McNemar Statistical Significance")
+    try:
+        df_mcnemar = pd.read_csv("results/analysis/mcnemar_results_vihsd.csv")
+        df_mcnemar["p_value"] = df_mcnemar["p_value"].apply(lambda x: f"{x:.6f}")
+        st.dataframe(df_mcnemar, use_container_width=True)
+    except FileNotFoundError:
+        st.warning("File results/analysis/mcnemar_results_vihsd.csv not found.")
+
+    st.divider()
+
+    st.subheader("📈 Combined Model Comparison")
+    import os
+    if os.path.exists("results/images/combined_comparison.png"):
+        st.image("results/images/combined_comparison.png", caption="Grouped bar chart comparing all models", use_container_width=True)
+    else:
+        st.warning("Image results/images/combined_comparison.png not found.")
+
+    st.divider()
+
+    st.subheader("🔍 Top Misclassification Patterns")
+    st.markdown("Phân tích các pattern lỗi phổ biến nhất từ mô hình vit5_finetune_balanced.")
+    if os.path.exists("results/images/error_distribution_vihsd_vit5_finetune_balanced.png"):
+        st.image("results/images/error_distribution_vihsd_vit5_finetune_balanced.png", caption="Error distribution — vit5_finetune_balanced", use_container_width=True)
+    else:
+        st.warning("Error distribution image not found.")
+
+# ======================== TAB 6: About ========================
 with tab_about:
     st.header("About This Project")
 

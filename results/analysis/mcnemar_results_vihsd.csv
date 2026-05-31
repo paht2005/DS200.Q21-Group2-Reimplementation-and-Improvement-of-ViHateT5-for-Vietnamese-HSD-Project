@@ -1,0 +1,6 @@
+model_a,model_b,task,chi2,p_value,n01,n10,significant,reliable
+vit5_finetune_balanced,vihatet5_reimpl,vihsd,63.3772,0.0,100,14,True,True
+vit5_finetune_balanced,visobert_labeling,vihsd,9.4464,0.002116,40,16,True,True
+vit5_finetune_balanced,vit5_finetune_hate_only,vihsd,0.0833,0.77283,7,5,False,False
+vit5_finetune_balanced,vit5_finetune_multi,vihsd,0.0556,0.813664,10,8,False,False
+vit5_finetune_balanced,vit5_focal_loss_exp,vihsd,1.8947,0.168669,13,6,False,False

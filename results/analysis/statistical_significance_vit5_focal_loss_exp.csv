@@ -1,0 +1,3 @@
+Task,Metric,Mean,95% CI Lower,95% CI Upper
+ViHSD,Macro F1,0.4977,0.4546,0.5414
+ViHSD,Accuracy,0.7458,0.6821,0.8092
