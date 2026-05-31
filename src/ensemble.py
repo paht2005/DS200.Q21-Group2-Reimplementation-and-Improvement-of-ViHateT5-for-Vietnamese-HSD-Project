@@ -29,7 +29,7 @@ class HateSpeechEnsemble:
     """
 
     def __init__(self, device: str = None):
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = device or ("mps" if torch.backends.mps.is_available() else ("cuda" if torch.cuda.is_available() else "cpu"))
         self.models = {}
         self.weights = {}
 
@@ -42,7 +42,8 @@ class HateSpeechEnsemble:
         self.models[name] = {"type": "t5", "model": model, "tokenizer": tokenizer}
         self.weights[name] = weight
 
-    def add_bert_model(self, name: str, model_path: str, num_labels: int, weight: float = 1.0):
+    def add_bert_model(self, name: str, model_path: str, num_labels: int, weight: float = 1.0,
+                       label_remap: Optional[Dict[int, int]] = None):
         """Add a BERT-based model to the ensemble."""
         tokenizer = AutoTokenizer.from_pretrained(model_path)
         model = AutoModelForSequenceClassification.from_pretrained(
@@ -50,7 +51,7 @@ class HateSpeechEnsemble:
         )
         model.to(self.device)
         model.eval()
-        self.models[name] = {"type": "bert", "model": model, "tokenizer": tokenizer}
+        self.models[name] = {"type": "bert", "model": model, "tokenizer": tokenizer, "label_remap": label_remap}
         self.weights[name] = weight
 
     def predict_t5(self, model_info: dict, texts: List[str], task_prefix: str,
@@ -136,6 +137,8 @@ class HateSpeechEnsemble:
                 preds = self.predict_t5(info, texts, "hate-speech-detection", label_map)
             else:
                 preds, _ = self.predict_bert(info, texts)
+                if info.get("label_remap"):
+                    preds = np.array([info["label_remap"].get(int(p), int(p)) for p in preds])
             all_preds[name] = preds
 
         if method == "weighted":
@@ -153,6 +156,8 @@ class HateSpeechEnsemble:
                 preds = self.predict_t5(info, texts, "toxic-speech-detection", label_map)
             else:
                 preds, _ = self.predict_bert(info, texts)
+                if info.get("label_remap"):
+                    preds = np.array([info["label_remap"].get(int(p), int(p)) for p in preds])
             all_preds[name] = preds
 
         if method == "weighted":

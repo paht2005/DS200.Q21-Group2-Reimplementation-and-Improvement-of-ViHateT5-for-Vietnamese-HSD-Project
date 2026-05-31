@@ -19,6 +19,8 @@ GPU="0"
 USE_FOCAL_LOSS=false
 FOCAL_GAMMA=2.0
 LABEL_SMOOTHING=0.0
+AUGMENT_MINORITY=false
+AUGMENT_FACTOR=0.8
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -87,6 +89,14 @@ while [[ $# -gt 0 ]]; do
             LABEL_SMOOTHING="$2"
             shift 2
             ;;
+        --augment_minority)
+            AUGMENT_MINORITY=true
+            shift 1
+            ;;
+        --augment_factor)
+            AUGMENT_FACTOR="$2"
+            shift 2
+            ;;
         *)
             echo "Unknown option: $1"
             echo "Usage: bash scripts/run_train_t5.sh [options]"
@@ -118,6 +128,8 @@ echo "GPU: $GPU"
 echo "Use focal loss: $USE_FOCAL_LOSS"
 echo "Focal gamma: $FOCAL_GAMMA"
 echo "Label smoothing: $LABEL_SMOOTHING"
+echo "Augment minority: $AUGMENT_MINORITY"
+echo "Augment factor: $AUGMENT_FACTOR"
 echo "=========================================="
 echo ""
 
@@ -125,6 +137,12 @@ echo ""
 FOCAL_ARGS=""
 if [ "$USE_FOCAL_LOSS" = true ]; then
     FOCAL_ARGS="--use_focal_loss --focal_gamma $FOCAL_GAMMA --label_smoothing $LABEL_SMOOTHING"
+fi
+
+# Build augmentation arguments conditionally
+AUGMENT_ARGS=""
+if [ "$AUGMENT_MINORITY" = true ]; then
+    AUGMENT_ARGS="--augment_minority --augment_factor $AUGMENT_FACTOR"
 fi
 
 # Run training
@@ -142,7 +160,8 @@ python src/train_t5.py \
     --lr_scheduler_type "$LR_SCHEDULER" \
     --seed $SEED \
     --gpu "$GPU" \
-    $FOCAL_ARGS
+    $FOCAL_ARGS \
+    $AUGMENT_ARGS
 
 echo ""
 echo "✅ Fine-tuning completed! Model saved to: $OUTPUT_DIR"

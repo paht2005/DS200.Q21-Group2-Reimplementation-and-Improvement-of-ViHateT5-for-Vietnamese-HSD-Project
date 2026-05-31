@@ -30,6 +30,7 @@ except LookupError:
 
 from data_loader import load_dataset_by_name
 from focal_loss import FocalLossSeq2SeqTrainer
+from augment import augment_minority_classes
 
 # Set tokenizer parallelism to false
 os.environ["TOKENIZERS_PARALLELISM"] = 'False'
@@ -52,6 +53,8 @@ parser.add_argument('--gpu', type=str, default='0', help='GPU number')
 parser.add_argument('--use_focal_loss', action='store_true', help='Use focal loss instead of standard CrossEntropy')
 parser.add_argument('--focal_gamma', type=float, default=2.0, help='Focal loss gamma parameter (focusing strength)')
 parser.add_argument('--label_smoothing', type=float, default=0.0, help='Label smoothing factor (0.0 = no smoothing)')
+parser.add_argument('--augment_minority', action='store_true', help='Augment minority classes (HATE, OFFENSIVE) using EDA techniques')
+parser.add_argument('--augment_factor', type=float, default=0.8, help='Target ratio for augmentation (0.0-1.0, where 1.0 = fully balanced with majority class)')
 
 # Parse arguments
 bash_args = parser.parse_args()
@@ -63,6 +66,8 @@ if bash_args.focal_gamma < 0:
     parser.error("--focal_gamma must be >= 0")
 if bash_args.label_smoothing < 0.0 or bash_args.label_smoothing > 1.0:
     parser.error("--label_smoothing must be between 0.0 and 1.0")
+if bash_args.augment_factor < 0.0 or bash_args.augment_factor > 1.0:
+    parser.error("--augment_factor must be between 0.0 and 1.0")
 
 # Define GPU
 os.environ["CUDA_VISIBLE_DEVICES"]=bash_args.gpu
@@ -268,6 +273,21 @@ print('PROGRESS|Loading datasets...')
 vihsd_train_df, vihsd_val_df, vihsd_test_df, _ = load_dataset_by_name('ViHSD')
 victsd_train_df, victsd_val_df, victsd_test_df, _ = load_dataset_by_name('ViCTSD')
 vihos_train_df, vihos_val_df, vihos_test_df, _ = load_dataset_by_name('ViHOS')
+
+# Apply data augmentation to minority classes if requested
+if bash_args.augment_minority:
+    print(f'PROGRESS|Augmenting minority classes (target_ratio={bash_args.augment_factor})...')
+    vihsd_train_df = augment_minority_classes(
+        vihsd_train_df, text_col='free_text', label_col='label_id',
+        target_ratio=bash_args.augment_factor, seed=bash_args.seed
+    )
+    victsd_train_df = augment_minority_classes(
+        victsd_train_df, text_col='Comment', label_col='Toxicity',
+        target_ratio=bash_args.augment_factor, seed=bash_args.seed
+    )
+    # ViHOS is NOT augmented — span annotations (index_spans) would be
+    # invalidated by text transformations. Only classification tasks are augmented.
+    print(f'PROGRESS|Augmentation complete. ViHOS skipped (span-based annotations).')
 
 # Keep original test datasets for evaluation (before mapping)
 vihsd_test_df_orig = vihsd_test_df.copy()

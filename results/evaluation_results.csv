@@ -1,0 +1,4 @@
+Model,Task,Accuracy,Weighted F1 Score,Macro F1 Score
+vit5_focal_loss_exp,ViHSD,0.9172,0.9225,0.7478
+vit5_focal_loss_exp,ViCTSD,0.895,0.9352,0.5382
+vit5_focal_loss_exp,ViHOS,0.8942,0.8822,0.8247

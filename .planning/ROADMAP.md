@@ -65,13 +65,19 @@ Plans:
 ---
 
 ## Phase 3: Data Augmentation Pipeline
-**Status**: `NOT_STARTED`
+**Status**: `PLANNED`
 **Priority**: MEDIUM
 **Estimated**: 3-4 hours
+**Requirements:** [IMP-03]
 
 ### Goals
 - Integrate augmentation vào data loading
 - Support selective augmentation cho minority classes
+
+### Plans: 1 plan
+
+Plans:
+- [ ] 03-01-PLAN.md — CLI integration, augmentation pipeline, tests, standalone script
 
 ### Tasks
 | ID | Task | File | Complexity |
@@ -92,13 +98,19 @@ Plans:
 ---
 
 ## Phase 4: Ensemble Evaluation
-**Status**: `NOT_STARTED`
+**Status**: `PLANNED`
 **Priority**: MEDIUM
 **Estimated**: 2-3 hours
+**Requirements:** [REQ-04]
 
 ### Goals
 - Create script để chạy ensemble từ multiple models
 - Support different voting strategies
+
+### Plans: 1 plan
+
+Plans:
+- [ ] 04-01-PLAN.md — Ensemble CLI script, MPS/label_remap fix, results CSV, README, tests
 
 ### Tasks
 | ID | Task | File | Complexity |

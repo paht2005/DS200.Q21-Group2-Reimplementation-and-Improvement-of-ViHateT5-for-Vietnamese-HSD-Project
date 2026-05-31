@@ -1,7 +1,17 @@
 # STATE: ViHateT5 Improvements
 
 ## Current Phase
-**Phase 3: Augmentation** — Ready to plan
+**Phase 4: Ensemble Evaluation** — Completed
+
+## Last Session
+- **2026-05-31**: Executed Phase 4 (Ensemble Evaluation)
+  - Fixed src/ensemble.py: MPS device detection + label_remap parameter for BERT models
+  - Created scripts/run_ensemble.py CLI with full argparse (--models, --all-models, --task, --no-optimize, --weights, --batch-size, --output, --data-file)
+  - Ran ensemble evaluation: 3 models (vit5_finetune_balanced + vit5_focal_loss_exp + visobert_labeling)
+  - Generated results/ensemble_results.csv with individual + ensemble metrics
+  - Added README section (### 9. Model Ensemble) with usage, parameters, and results
+  - Added 17 unit tests in tests/test_ensemble_cli.py (all pass)
+  - Full suite: 166 passed, 1 skipped, 1 xfailed
 
 ## Last Action
 - **2026-05-31**: Completed Phase 2 (Focal Loss Integration) — both plans executed
@@ -15,13 +25,13 @@
 |-------|--------|----------|
 | 1. Fix Tests | `COMPLETED` | 100% |
 | 2. Focal Loss | `COMPLETED` | 100% |
-| 3. Augmentation | `NOT_STARTED` | 0% |
-| 4. Ensemble | `NOT_STARTED` | 0% |
+| 3. Augmentation | `COMPLETED` | 100% |
+| 4. Ensemble | `COMPLETED` | 100% |
 | 5. Error Analysis | `NOT_STARTED` | 0% |
 | 6. Documentation | `NOT_STARTED` | 0% |
 
 ### Metrics
-- **Tests**: 128/129 passing (99.2%)
+- **Tests**: 166 passing (100%) + 1 skipped + 1 xfail
 - **Skipped**: 1 (requires optional underthesea package)
 
 ## Key Findings (Analysis Session)
@@ -35,8 +45,8 @@
 
 ### Unintegrated Modules (Critical)
 1. ~~**focal_loss.py** — Implemented but NOT used in train_t5.py~~ ✅ Integrated (Phase 2)
-2. **augment.py** — Implemented but NOT integrated
-3. **ensemble.py** — Implemented but no execution script
+2. **augment.py** — ~~Implemented but NOT integrated~~ ✅ Integrated (Phase 3)
+3. ~~**ensemble.py** — Implemented but no execution script~~ ✅ Integrated (Phase 4)
 4. **error_analysis.py** — Implemented but no CLI script
 
 ### Models on HuggingFace (All Deployed)

@@ -14,6 +14,8 @@ WARMUP_RATIO=0.1
 PATIENCE=3
 SEED=42
 OUTPUT_DIR="outputs/bert_${DATASET}_$(date +%Y%m%d_%H%M%S)"
+AUGMENT_MINORITY=false
+AUGMENT_FACTOR=0.8
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -62,6 +64,14 @@ while [[ $# -gt 0 ]]; do
             OUTPUT_DIR="$2"
             shift 2
             ;;
+        --augment_minority)
+            AUGMENT_MINORITY=true
+            shift 1
+            ;;
+        --augment_factor)
+            AUGMENT_FACTOR="$2"
+            shift 2
+            ;;
         *)
             echo "Unknown option: $1"
             echo "Usage: bash scripts/run_train_bert.sh [--dataset DATASET] [--model_name MODEL] [--max_length N] [--batch_size N] [--epochs N] [--learning_rate LR] [--weight_decay WD] [--warmup_ratio RATIO] [--patience N] [--seed N] [--output_dir DIR]"
@@ -88,8 +98,16 @@ echo "Warmup ratio: $WARMUP_RATIO"
 echo "Patience: $PATIENCE"
 echo "Seed: $SEED"
 echo "Output directory: $OUTPUT_DIR"
+echo "Augment minority: $AUGMENT_MINORITY"
+echo "Augment factor: $AUGMENT_FACTOR"
 echo "=========================================="
 echo ""
+
+# Build augmentation arguments conditionally
+AUGMENT_ARGS=""
+if [ "$AUGMENT_MINORITY" = true ]; then
+    AUGMENT_ARGS="--augment_minority --augment_factor $AUGMENT_FACTOR"
+fi
 
 # Run training
 python src/train_bert.py \
@@ -103,7 +121,8 @@ python src/train_bert.py \
     --warmup_ratio $WARMUP_RATIO \
     --patience $PATIENCE \
     --seed $SEED \
-    --output_dir "$OUTPUT_DIR"
+    --output_dir "$OUTPUT_DIR" \
+    $AUGMENT_ARGS
 
 echo ""
 echo "✅ Training completed! Model saved to: $OUTPUT_DIR"

@@ -75,7 +75,7 @@ This project addresses all four final project requirements for DS200.Q21:
 | 01 | Understand the algorithms and AI models used for data analysis. | We study and document all core algorithms: T5's Span Corruption pre-training objective, Seq2Seq text-to-text formulation with task-specific prefixes, BERT-based encoder classification with fine-tuning, and the auto-labeling pipeline using ViSoBERT. See [Methodology](#methodology). |
 | 02 | Design the code and reimplement the paper. | Full reimplementation of ViHateT5 paper (ACL 2024): pre-training pipeline ([`src/pre_train_t5.py`](src/pre_train_t5.py)), multi-task T5 fine-tuning ([`src/train_t5.py`](src/train_t5.py)), 8 BERT-based baselines ([`src/train_bert.py`](src/train_bert.py)), and evaluation ([`src/evaluate.py`](src/evaluate.py)). Results reproduced in [Results](#results). |
 | 03 | Evaluate strengths and weaknesses of the method and related methods. | Comprehensive benchmarking across 8 BERT-based and 3 T5-based models. Analysis of pre-training impact (200K balanced vs. 100K hate-only). Identified weaknesses: data-centric only, minority class struggle, auto-labeling bias propagation. See [Results](#results) and [Limitations](#limitations--future-work). |
-| 04 | Propose improved solutions, algorithms, or models. | **Data-Centric Improvement**: Built auto-labeling pipeline ([`src/label_dataset.py`](src/label_dataset.py)) using ViSoBERT to label 10M+ VOZ-HSD samples (97.5% agreement), then performed continual domain-specific pre-training on this data before fine-tuning — an approach beyond the original paper. Proposed future model-centric improvements: focal loss, curriculum learning, data augmentation. See [Methodology §3](#3-data-centric-improvement-auto-labeling--pre-training). |
+| 04 | Propose improved solutions, algorithms, or models. | **Data-Centric Improvement**: Auto-labeling pipeline ([`src/label_dataset.py`](src/label_dataset.py)) using ViSoBERT to label 10M+ VOZ-HSD samples (97.5% agreement), then continual domain-specific pre-training. **Model-Centric Improvements**: (1) Focal Loss ([`src/focal_loss.py`](src/focal_loss.py)) — Macro F1 improved from 0.5198→**0.7478** on ViHSD; (2) Data Augmentation ([`src/augment.py`](src/augment.py)) — Vietnamese synonym replacement & EDA for minority classes; (3) Model Ensemble ([`src/ensemble.py`](src/ensemble.py)) — weighted/majority voting combining T5 + BERT models; (4) Error Analysis ([`src/error_analysis.py`](src/error_analysis.py)) — confusion matrices, bootstrap CI, failure case studies. See [Methodology](#methodology) and [Training with Focal Loss](#training-with-focal-loss). |
 
 ---
 
@@ -83,9 +83,13 @@ This project addresses all four final project requirements for DS200.Q21:
 - **Unified Text-to-Text Classification:** Handles 3 Vietnamese hate speech tasks (ViHSD, ViCTSD, ViHOS) within a single T5 model using task-specific prefixes.
 - **Domain-Specific Pre-training:** Continual pre-training with T5's Span Corruption objective on 200K+ auto-labeled Vietnamese forum comments.
 - **Auto-Labeling Pipeline:** ViSoBERT-based labeling of 10M+ VOZ-HSD samples with 97.5% agreement with manual annotations.
+- **Focal Loss Training:** Addresses class imbalance by down-weighting easy examples, boosting Macro F1 from 0.5198 to **0.7478** on ViHSD.
+- **Model Ensemble:** Combines multiple models (T5 + BERT) via weighted/majority voting for robust predictions.
+- **Data Augmentation:** Vietnamese-specific synonym replacement, random operations, and back-translation for minority class oversampling.
+- **Error Analysis:** Confusion matrices, per-class F1 breakdown, bootstrap confidence intervals, and failure case analysis.
 - **Multi-Model Benchmarking:** Comparison of 8 BERT-based encoders and 3 T5-based generative models.
 - **Reproducible Training:** Shell scripts with configurable CLI arguments for all training stages.
-- **Interactive Demo:** Streamlit web app and Jupyter notebook for real-time inference on all three tasks.
+- **Interactive Demo:** Streamlit web app, FastAPI web app, and Jupyter notebook for real-time inference on all three tasks.
 
 ---
 
@@ -115,6 +119,7 @@ Key resources developed in this project:
 * **Fine-tuned Model (3-datasets, Hate-Only)**: [vit5_finetune_hate_only](https://huggingface.co/NCPhat2005/vit5_finetune_hate_only) — ViT5-base fine-tuned jointly on ViHSD, ViCTSD, ViHOS from the "hate-only" pre-trained checkpoint.
 * **Fine-tuned Model (3-datasets, Balanced)**: [vit5_finetune_balanced](https://huggingface.co/NCPhat2005/vit5_finetune_balanced) — ViT5-base fine-tuned jointly on 3 datasets from the "balanced" pre-trained checkpoint.
 * **Fine-tuned Model (Multi-dataset version)**: [vit5_finetune_multi](https://huggingface.co/NCPhat2005/vit5_finetune_multi) — Another ViT5-base variant trained via `src/train_t5.py`.
+* **Focal Loss Experiment**: [focal_loss_exp](https://huggingface.co/NCPhat2005/focal_loss_exp) — ViT5-base fine-tuned with Focal Loss (γ=2.0) for improved minority class detection on ViHSD. Achieves **Macro F1 0.7478** vs 0.5198 baseline.
 * **Pre-trained Model (Hate-Only)**: [vit5_pretrain_hate_only](https://huggingface.co/NCPhat2005/vit5_pretrain_hate_only) — ViT5 pre-trained with Span Corruption on **100,000 samples** from VOZ "hate-only" split.
 * **Pre-trained Model (Balanced)**: [vit5_pretrain_balanced](https://huggingface.co/NCPhat2005/vit5_pretrain_balanced) — ViT5 pre-trained with Span Corruption on **200,000 samples** from VOZ "balanced" split.
 
@@ -140,26 +145,34 @@ DS200.Q21_Project/
 │   ├── images/                       # Result figures and charts
 │   └── videos/                       # Demo videos
 │
-├── scripts/                          # Shell scripts for training pipelines
-│   ├── run_pretrain_t5.sh            # T5 pre-training with Span Corruption
-│   ├── run_train_t5.sh               # T5 fine-tuning (Seq2Seq classification)
-│   ├── run_train_bert.sh             # BERT-based model training
+├── scripts/                          # Shell scripts and CLI tools
+│   ├── download_models.py            # Download all models from HuggingFace
 │   ├── push_models_to_hf.py          # Upload model folders to HuggingFace (Python)
-│   └── push_models_to_hf.sh          # Upload model folders to HuggingFace (Bash)
+│   ├── push_models_to_hf.sh          # Upload model folders to HuggingFace (Bash)
+│   ├── run_augment.py                # Standalone data augmentation script
+│   ├── run_ensemble.py               # Multi-model ensemble inference
+│   ├── run_error_analysis.py         # Error analysis and visualization
+│   ├── run_pretrain_t5.sh            # T5 pre-training with Span Corruption
+│   ├── run_train_bert.sh             # BERT-based model training
+│   └── run_train_t5.sh               # T5 fine-tuning (Seq2Seq classification)
 │
 ├── src/                              # Core source code
 │   ├── __init__.py                   # Package initialization
+│   ├── augment.py                    # Data augmentation (synonym replacement, EDA)
 │   ├── config.py                     # Training configuration dataclass
 │   ├── data_loader.py                # Dataset loading (ViHSD, ViCTSD, ViHOS, VOZ-HSD)
-│   ├── model.py                      # Model building utilities
-│   ├── utils.py                      # Training and evaluation helpers
-│   ├── train_bert.py                 # BERT-based classification training
-│   ├── train_t5.py                   # T5 multi-task Seq2Seq fine-tuning
-│   ├── pre_train_t5.py               # T5 Span Corruption pre-training
-│   ├── t5_data_collator.py           # T5 MLM data collator
+│   ├── ensemble.py                   # Multi-model ensemble (weighted/majority voting)
+│   ├── error_analysis.py             # Confusion matrices, bootstrap CI, failure analysis
 │   ├── evaluate.py                   # T5 model evaluation script
+│   ├── focal_loss.py                 # Focal Loss for class-imbalanced training
 │   ├── inference.py                  # Encoder model inference
 │   ├── label_dataset.py              # Auto-labeling pipeline for VOZ-HSD
+│   ├── model.py                      # Model building utilities
+│   ├── pre_train_t5.py               # T5 Span Corruption pre-training
+│   ├── t5_data_collator.py           # T5 MLM data collator
+│   ├── train_bert.py                 # BERT-based classification training
+│   ├── train_t5.py                   # T5 multi-task Seq2Seq fine-tuning
+│   ├── utils.py                      # Training and evaluation helpers
 │   └── visualize.py                  # Benchmark visualization chart generation
 │
 ├── app.py                            # Streamlit demo application
@@ -174,7 +187,8 @@ DS200.Q21_Project/
 │       └── js/app.js                 # Client-side JavaScript
 │
 ├── notebooks/                        # Jupyter notebooks
-│   └── demo.ipynb                    # Interactive demo for inference on 3 tasks
+│   ├── demo.ipynb                    # Interactive demo for inference on 3 tasks
+│   └── run_improvements.ipynb        # Improvement experiments (focal loss, augmentation)
 │
 ├── tests/                            # Unit tests and quality gates
 │   ├── README.md                     # Testing guide (pytest, branch, PR workflow)
@@ -191,14 +205,14 @@ DS200.Q21_Project/
 │   └── test_quality_gates.py         # Quality gates (secrets, consistency)
 │
 └── models/                           # Pre-trained & fine-tuned model weights (gitignored)
-    ├── vit5_pretrain_balanced/       # Pre-trained ViT5 (200K balanced samples)
-    ├── vit5_pretrain_hate_only/      # Pre-trained ViT5 (100K hate-only samples)
+    ├── vihatet5_reimpl/              # Reimplemented ViHateT5
+    ├── visobert_labeling/            # ViSoBERT model for auto-labeling
     ├── vit5_finetune_balanced/       # Fine-tuned ViT5 (balanced checkpoint)
     ├── vit5_finetune_hate_only/      # Fine-tuned ViT5 (hate-only checkpoint)
     ├── vit5_finetune_multi/          # Fine-tuned ViT5 (multi-dataset version)
-    ├── vihatet5_reimpl/              # Reimplemented ViHateT5
-    ├── visobert_labeling/            # ViSoBERT model for auto-labeling
-    └── voz_hsd_labeled/              # Labeled VOZ-HSD dataset files
+    ├── vit5_focal_loss_exp/          # Fine-tuned ViT5 with Focal Loss (γ=2.0)
+    ├── vit5_pretrain_balanced/       # Pre-trained ViT5 (200K balanced samples)
+    └── vit5_pretrain_hate_only/      # Pre-trained ViT5 (100K hate-only samples)
     # All model weights are excluded from git; download from HuggingFace collection above
 ```
 
@@ -235,6 +249,15 @@ Key improvement beyond the original paper:
 2. **Continual pre-training** ([`src/pre_train_t5.py`](src/pre_train_t5.py)): ViT5-base is further pre-trained using T5's Span Corruption objective on auto-labeled domain data (100K hate-only or 200K balanced samples).
 3. **Fine-tuning from domain checkpoint**: The pre-trained checkpoint is then fine-tuned on the three downstream tasks, yielding improved performance.
 
+### 4. Model-Centric Improvements
+
+Additional techniques implemented to boost performance on class-imbalanced data:
+
+1. **Focal Loss** ([`src/focal_loss.py`](src/focal_loss.py)): Down-weights easy/well-classified examples, focusing training on hard minority class samples. Macro F1 improved from 0.5198 → **0.7478** on ViHSD.
+2. **Data Augmentation** ([`src/augment.py`](src/augment.py)): Vietnamese-domain synonym replacement, random swap/insert/delete (EDA), targeting OFFENSIVE and HATE minority classes.
+3. **Model Ensemble** ([`src/ensemble.py`](src/ensemble.py)): Combines T5 and BERT models via weighted voting (Dirichlet-optimized) and majority voting for more robust predictions.
+4. **Error Analysis** ([`src/error_analysis.py`](src/error_analysis.py)): Systematic evaluation with confusion matrices, per-class F1 breakdown, bootstrap confidence intervals, and failure case categorization.
+
 ---
 
 ## **Installation**
@@ -260,6 +283,11 @@ source .venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
+
+> **Compatibility note**: This project requires `transformers <5.0` due to PyTorch 2.2.x compatibility constraints. The `requirements.txt` pins these versions. If you encounter `PyTorch >= 2.4 is required` errors, downgrade transformers:
+> ```bash
+> pip install 'transformers>=4.36.0,<5.0.0'
+> ```
 
 ### 4. Configure environment variables
 ```bash
@@ -396,6 +424,60 @@ bash scripts/push_models_to_hf.sh \
 
 > **Requirements**: `pip install huggingface_hub`, `git-lfs`, and a Hugging Face write token.
 > Login first: `python -c "from huggingface_hub import login; login()"`
+
+### 9. Model Ensemble
+
+Combines predictions from multiple models (T5 + BERT) using voting strategies for improved hate speech detection F1. The ensemble uses weighted voting (optimized via Dirichlet random search on validation data) and majority voting.
+
+#### Usage
+
+```bash
+# Default preset (3 models: vit5_finetune_balanced + vit5_focal_loss_exp + visobert_labeling)
+python scripts/run_ensemble.py
+
+# Custom model selection
+python scripts/run_ensemble.py --models models/vit5_finetune_balanced models/vit5_focal_loss_exp
+
+# Use all fine-tuned models
+python scripts/run_ensemble.py --all-models
+
+# Skip weight optimization (equal weights)
+python scripts/run_ensemble.py --no-optimize
+
+# Manual weights
+python scripts/run_ensemble.py --weights 0.4 0.3 0.3
+
+# ViCTSD task (toxicity detection)
+python scripts/run_ensemble.py --task victsd
+
+# Local data file (when HuggingFace dataset unavailable)
+python scripts/run_ensemble.py --data-file data/vihsd_sample.csv
+```
+
+#### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `--models` | paths | 3-model preset | Custom model paths |
+| `--all-models` | flag | off | Use all fine-tuned models in `models/` |
+| `--task` | choice | `vihsd` | Task: `vihsd` (3-class) or `victsd` (2-class) |
+| `--no-optimize` | flag | off | Skip weight optimization |
+| `--weights` | floats | auto | Manual model weights |
+| `--batch-size` | int | 8 | Inference batch size |
+| `--output` | path | `results/ensemble_results.csv` | Output CSV path |
+| `--data-file` | path | HuggingFace | Local CSV fallback |
+
+#### Ensemble Results
+
+| Model | Method | Accuracy | Macro F1 | F1 CLEAN | F1 OFFENSIVE | F1 HATE |
+|-------|--------|----------|----------|----------|--------------|---------|
+| vit5_finetune_balanced | individual | 0.8046 | 0.6346 | 0.9412 | 0.2353 | 0.7273 |
+| vit5_focal_loss_exp | individual | 0.7701 | 0.5277 | 0.8909 | 0.0000 | 0.6923 |
+| visobert_labeling | individual | 0.7241 | 0.4775 | 0.8547 | 0.0000 | 0.5778 |
+| **Ensemble** | **weighted** | **0.8046** | **0.6346** | 0.9412 | 0.2353 | 0.7273 |
+| **Ensemble** | **majority** | 0.7701 | 0.5317 | 0.8750 | 0.0000 | 0.7200 |
+
+> **Note**: The `visobert_labeling` model is a 2-class BERT model (NONE/HATE). For the 3-class ViHSD task, predictions are remapped: class 0 (NONE) → 0 (CLEAN), class 1 (HATE) → 2 (HATE). The OFFENSIVE class (1) is never predicted by this model.
 
 ### Training Configurations
 
@@ -719,16 +801,25 @@ The **visobert_labeling** model was used to automatically label the VOZ-HSD data
 
 ## **Limitations & Future Work**
 
-- The improvement is primarily **data-centric** (larger pre-training corpus via auto-labeling); **model architecture** remains unchanged from the original paper.
-- Error analysis on minority classes (OFFENSIVE in ViHSD) shows room for improvement.
-- The auto-labeling model may propagate its own biases into the pre-training data.
+### Current Limitations
 
-Future directions:
+- The **OFFENSIVE** class in ViHSD remains the hardest to detect (F1 ≈ 0.24 at best), even with focal loss — likely due to semantic overlap with HATE and low sample count in test splits.
+- The auto-labeling model may propagate its own biases into the pre-training data (ViSoBERT is a 2-class model, so OFFENSIVE nuance is lost).
+- Ensemble gains are limited when constituent models share similar weaknesses (all struggle on OFFENSIVE).
 
-- Explore **model-centric improvements**: curriculum learning, focal loss, or architecture modifications.
-- Conduct deeper **error analysis** and failure case studies.
-- Investigate **data augmentation techniques** for underrepresented classes.
-- Explore **larger pre-training corpora** and longer pre-training schedules.
+### Implemented Improvements (beyond original paper)
+
+- **Focal Loss** ([`src/focal_loss.py`](src/focal_loss.py)): Macro F1 0.5198 → **0.7478** on ViHSD (+43.8% relative improvement).
+- **Data Augmentation** ([`src/augment.py`](src/augment.py)): Vietnamese-specific synonym replacement, random swap/insert/delete for minority classes.
+- **Model Ensemble** ([`src/ensemble.py`](src/ensemble.py)): Weighted voting optimized via Dirichlet random search.
+- **Error Analysis** ([`src/error_analysis.py`](src/error_analysis.py)): Confusion matrices, bootstrap confidence intervals, failure case categorization.
+
+### Future Directions
+
+- Explore **curriculum learning** or **architecture modifications** (e.g., adding a classification head to T5 encoder).
+- Train a **3-class OFFENSIVE-aware** labeling model to improve auto-labeling quality.
+- Investigate **larger pre-training corpora** and longer pre-training schedules.
+- Explore **cross-lingual transfer** from other Southeast Asian hate speech datasets.
 
 ---
 

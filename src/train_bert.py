@@ -21,6 +21,7 @@ from config import TrainConfig
 from data_loader import load_dataset_by_name, build_torch_dataset
 from model import build_model
 from utils import set_seed, evaluate, train_epoch
+from augment import augment_minority_classes
 
 
 def parse_args():
@@ -49,6 +50,10 @@ def parse_args():
                        help="Random seed")
     parser.add_argument("--output_dir", type=str, default=None,
                        help="Output directory for model")
+    parser.add_argument("--augment_minority", action="store_true",
+                       help="Augment minority classes using EDA techniques")
+    parser.add_argument("--augment_factor", type=float, default=0.8,
+                       help="Target ratio for augmentation (0.0-1.0, where 1.0 = fully balanced)")
     
     return parser.parse_args()
 
@@ -96,6 +101,15 @@ def main():
     print(f"  Text column: {metadata['text_col']}")
     print(f"  Label column: {metadata['label_col']}")
     print(f"  Number of labels: {metadata['num_labels']}")
+    
+    # Apply data augmentation if requested
+    if args.augment_minority:
+        print(f"\n\U0001f4ca Augmenting minority classes (target_ratio={args.augment_factor})...")
+        train_df = augment_minority_classes(
+            train_df, text_col=metadata['text_col'], label_col=metadata['label_col'],
+            target_ratio=args.augment_factor, seed=config.seed
+        )
+        print(f"  Augmented train samples: {len(train_df)}")
     
     # Build model and tokenizer
     print(f"\n🤖 Building model: {config.model_name}")

@@ -50,8 +50,7 @@ models/
 *.ckpt
 
 # Data files
-data/raw/
-data/processed/
+data/
 *.csv
 *.tsv
 *.json
@@ -78,4 +77,8 @@ Thumbs.db
 # Reference PDFs (not part of project)
 refer.pdf
 
+# Reference files (not part of project)
+reference/
 
+# Planning files (not part of project)
+.planning/
